@@ -17,6 +17,16 @@ type AppConfig struct {
 	ShutdownTimeout    time.Duration
 	MaxBodyBytes       int64
 	APIKey             string
+	// JWT configuration
+	JWTSecret      string
+	JWTExpiration  time.Duration
+	// SMTP configuration
+	SMTPHost       string
+	SMTPPort       int
+	SMTPUsername   string
+	SMTPPassword   string
+	SMTPFrom       string
+	SMTPFromName   string
 }
 
 var DefaultConfig = AppConfig{
@@ -29,6 +39,10 @@ var DefaultConfig = AppConfig{
 	IdleTimeout:        60 * time.Second,
 	ShutdownTimeout:    10 * time.Second,
 	MaxBodyBytes:       1 << 20,
+	JWTSecret:          "change-me-in-production",
+	JWTExpiration:      24 * time.Hour,
+	SMTPPort:           587,
+	SMTPFromName:       "XLPanel",
 }
 
 func LoadConfigFromEnv() AppConfig {
@@ -74,6 +88,34 @@ func LoadConfigFromEnv() AppConfig {
 	}
 	if value := os.Getenv("XLPANEL_API_KEY"); value != "" {
 		cfg.APIKey = value
+	}
+	if value := os.Getenv("XLPANEL_JWT_SECRET"); value != "" {
+		cfg.JWTSecret = value
+	}
+	if value := os.Getenv("XLPANEL_JWT_EXPIRATION"); value != "" {
+		if parsed, err := time.ParseDuration(value); err == nil {
+			cfg.JWTExpiration = parsed
+		}
+	}
+	if value := os.Getenv("XLPANEL_SMTP_HOST"); value != "" {
+		cfg.SMTPHost = value
+	}
+	if value := os.Getenv("XLPANEL_SMTP_PORT"); value != "" {
+		if parsed, err := strconv.Atoi(value); err == nil {
+			cfg.SMTPPort = parsed
+		}
+	}
+	if value := os.Getenv("XLPANEL_SMTP_USERNAME"); value != "" {
+		cfg.SMTPUsername = value
+	}
+	if value := os.Getenv("XLPANEL_SMTP_PASSWORD"); value != "" {
+		cfg.SMTPPassword = value
+	}
+	if value := os.Getenv("XLPANEL_SMTP_FROM"); value != "" {
+		cfg.SMTPFrom = value
+	}
+	if value := os.Getenv("XLPANEL_SMTP_FROM_NAME"); value != "" {
+		cfg.SMTPFromName = value
 	}
 	return cfg
 }

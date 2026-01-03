@@ -111,3 +111,42 @@ type Payment struct {
 	Status     string    `json:"status"`
 	ReceivedAt time.Time `json:"received_at"`
 }
+
+// User represents a user account with authentication capabilities
+type User struct {
+	ID             string    `json:"id"`
+	TenantID       string    `json:"tenant_id"`
+	Email          string    `json:"email"`
+	PasswordHash   string    `json:"-"` // Never expose password hash in JSON
+	Name           string    `json:"name"`
+	Role           string    `json:"role"` // admin, customer
+	TwoFactorSecret string   `json:"-"`     // TOTP secret, never expose
+	TwoFactorEnabled bool    `json:"two_factor_enabled"`
+	CreatedAt      time.Time `json:"created_at"`
+	LastLoginAt    *time.Time `json:"last_login_at,omitempty"`
+}
+
+// Session represents an authenticated user session
+type Session struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"user_id"`
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// CartItem represents an item in a shopping cart
+type CartItem struct {
+	ProductCode string  `json:"product_code"`
+	Quantity    int     `json:"quantity"`
+	UnitPrice   float64 `json:"unit_price"`
+}
+
+// Cart represents a shopping cart for a customer
+type Cart struct {
+	ID         string     `json:"id"`
+	CustomerID string     `json:"customer_id"`
+	TenantID   string     `json:"tenant_id"`
+	Items      []CartItem `json:"items"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+}

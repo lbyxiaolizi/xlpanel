@@ -29,6 +29,9 @@ type Server struct {
 	subService      *service.SubscriptionService
 	paymentsService *service.PaymentsService
 	autoService     *service.AutomationService
+	authService     *service.AuthService
+	cartService     *service.CartService
+	emailService    *service.EmailService
 	templates       map[string]*template.Template
 	templateMu      sync.RWMutex
 }
@@ -46,6 +49,9 @@ func NewServer(
 	subService *service.SubscriptionService,
 	paymentsService *service.PaymentsService,
 	autoService *service.AutomationService,
+	authService *service.AuthService,
+	cartService *service.CartService,
+	emailService *service.EmailService,
 ) *Server {
 	s := &Server{
 		config:          config,
@@ -60,6 +66,9 @@ func NewServer(
 		subService:      subService,
 		paymentsService: paymentsService,
 		autoService:     autoService,
+		authService:     authService,
+		cartService:     cartService,
+		emailService:    emailService,
 		templates:       make(map[string]*template.Template),
 	}
 
@@ -112,6 +121,7 @@ func (s *Server) loadTemplate(theme string) (*template.Template, error) {
 
 func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
+	// Admin routes
 	mux.HandleFunc("/", s.handleIndex)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/tenants", s.handleTenants)
@@ -129,6 +139,38 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/payments/gateways", s.handleGateways)
 	mux.HandleFunc("/payments/plugins/charge", s.handlePluginCharge)
 	mux.HandleFunc("/automation/jobs", s.handleJobs)
+	
+	// Auth routes
+	mux.HandleFunc("/login", s.handleLoginPage)
+	mux.HandleFunc("/register", s.handleRegisterPage)
+	mux.HandleFunc("/api/login", s.handleLogin)
+	mux.HandleFunc("/api/register", s.handleRegister)
+	mux.HandleFunc("/api/logout", s.handleLogout)
+	mux.HandleFunc("/api/2fa/enable", s.handle2FAEnable)
+	mux.HandleFunc("/api/2fa/verify", s.handle2FAVerify)
+	mux.HandleFunc("/api/2fa/disable", s.handle2FADisable)
+	
+	// Customer routes
+	mux.HandleFunc("/customer", s.handleCustomerDashboard)
+	mux.HandleFunc("/customer/products", s.handleCustomerProducts)
+	mux.HandleFunc("/customer/cart", s.handleCustomerCart)
+	mux.HandleFunc("/customer/orders", s.handleCustomerOrders)
+	mux.HandleFunc("/customer/invoices", s.handleCustomerInvoices)
+	
+	// Admin routes
+	mux.HandleFunc("/admin/users", s.handleAdminUsers)
+	
+	// Cart API routes
+	mux.HandleFunc("/api/cart", s.handleCartGet)
+	mux.HandleFunc("/api/cart/add", s.handleCartAdd)
+	mux.HandleFunc("/api/cart/update", s.handleCartUpdate)
+	mux.HandleFunc("/api/cart/remove", s.handleCartRemove)
+	mux.HandleFunc("/api/cart/clear", s.handleCartClear)
+	mux.HandleFunc("/api/cart/checkout", s.handleCartCheckout)
+	
+	// User API routes
+	mux.HandleFunc("/api/users", s.handleUsersAPI)
+	
 	return s.applyMiddlewares(mux)
 }
 
@@ -754,7 +796,24 @@ func (s *Server) withAuth(next http.Handler) http.Handler {
 }
 
 func isPublicRoute(path string) bool {
-	return path == "/" || path == "/health"
+	publicRoutes := []string{
+		"/",
+		"/health",
+		"/login",
+		"/register",
+		"/api/login",
+		"/api/register",
+		"/customer/products",
+		"/catalog/products",
+	}
+	
+	for _, route := range publicRoutes {
+		if path == route {
+			return true
+		}
+	}
+	
+	return false
 }
 
 func authorized(r *http.Request, apiKey string) bool {
