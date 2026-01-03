@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ .Lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ .Description }}">
-    <title>{{ if .Title }}{{ .Title }} - {{ end }}OpenHost</title>
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}{{ t "common.app_name" }}</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
@@ -36,9 +36,9 @@
                             </linearGradient>
                         </defs>
                     </svg>
-                    <span class="logo-text">OpenHost</span>
+                    <span class="logo-text">{{ t "common.app_name" }}</span>
                 </a>
-                <button class="navbar-toggle" id="navbarToggle">
+                <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -47,20 +47,29 @@
             
             <div class="navbar-menu" id="navbarMenu">
                 <ul class="navbar-nav">
-                    <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="/products" class="nav-link">Products</a></li>
-                    <li><a href="/pricing" class="nav-link">Pricing</a></li>
-                    <li><a href="/docs" class="nav-link">Documentation</a></li>
-                    <li><a href="/support" class="nav-link">Support</a></li>
+                    <li><a href="/" class="nav-link">{{ t "nav.home" }}</a></li>
+                    <li><a href="/products" class="nav-link">{{ t "nav.products" }}</a></li>
+                    <li><a href="/pricing" class="nav-link">{{ t "nav.pricing" }}</a></li>
+                    <li><a href="/docs" class="nav-link">{{ t "nav.docs" }}</a></li>
+                    <li><a href="/support" class="nav-link">{{ t "nav.support" }}</a></li>
                 </ul>
                 
                 <div class="navbar-actions">
+                    <!-- Language Switcher -->
+                    <div class="lang-switcher">
+                        {{ if eq .Lang "zh" }}
+                        <a href="?lang=en" class="lang-link" title="English">EN</a>
+                        {{ else }}
+                        <a href="?lang=zh" class="lang-link" title="中文">中文</a>
+                        {{ end }}
+                    </div>
+                    
                     {{ if .User }}
-                    <a href="/dashboard" class="btn btn-outline">Dashboard</a>
-                    <a href="/logout" class="btn btn-primary">Logout</a>
+                    <a href="/client" class="btn btn-outline">{{ t "nav.dashboard" }}</a>
+                    <a href="/logout" class="btn btn-primary">{{ t "nav.logout" }}</a>
                     {{ else }}
-                    <a href="/login" class="btn btn-outline">Login</a>
-                    <a href="/register" class="btn btn-primary">Sign Up</a>
+                    <a href="/login" class="btn btn-outline">{{ t "nav.login" }}</a>
+                    <a href="/register" class="btn btn-primary">{{ t "nav.register" }}</a>
                     {{ end }}
                 </div>
             </div>
@@ -85,59 +94,53 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h3 class="footer-title">OpenHost</h3>
+                    <h3 class="footer-title">{{ t "common.app_name" }}</h3>
                     <p class="footer-description">
-                        Modern hosting and billing management system built with Go. 
-                        An open-source alternative to WHMCS/Blesta.
+                        {{ t "common.app_tagline" }}
                     </p>
                     <div class="social-links">
-                        <a href="#" class="social-link" aria-label="GitHub">
+                        <a href="https://github.com/lbyxiaolizi/xlpanel" class="social-link" aria-label="GitHub" target="_blank" rel="noopener">
                             <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </a>
-                        <a href="#" class="social-link" aria-label="Twitter">
-                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
                             </svg>
                         </a>
                     </div>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-heading">Product</h4>
+                    <h4 class="footer-heading">{{ t "footer.product.title" }}</h4>
                     <ul class="footer-links">
-                        <li><a href="/features">Features</a></li>
-                        <li><a href="/pricing">Pricing</a></li>
-                        <li><a href="/roadmap">Roadmap</a></li>
-                        <li><a href="/changelog">Changelog</a></li>
+                        <li><a href="/features">{{ t "footer.product.features" }}</a></li>
+                        <li><a href="/pricing">{{ t "footer.product.pricing" }}</a></li>
+                        <li><a href="/roadmap">{{ t "footer.product.roadmap" }}</a></li>
+                        <li><a href="/changelog">{{ t "footer.product.changelog" }}</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-heading">Resources</h4>
+                    <h4 class="footer-heading">{{ t "footer.resources.title" }}</h4>
                     <ul class="footer-links">
-                        <li><a href="/docs">Documentation</a></li>
-                        <li><a href="/api">API Reference</a></li>
-                        <li><a href="/guides">Guides</a></li>
-                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/docs">{{ t "footer.resources.docs" }}</a></li>
+                        <li><a href="/api">{{ t "footer.resources.api" }}</a></li>
+                        <li><a href="/guides">{{ t "footer.resources.guides" }}</a></li>
+                        <li><a href="/blog">{{ t "footer.resources.blog" }}</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-col">
-                    <h4 class="footer-heading">Company</h4>
+                    <h4 class="footer-heading">{{ t "footer.company.title" }}</h4>
                     <ul class="footer-links">
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/contact">Contact</a></li>
-                        <li><a href="/privacy">Privacy</a></li>
-                        <li><a href="/terms">Terms</a></li>
+                        <li><a href="/about">{{ t "footer.company.about" }}</a></li>
+                        <li><a href="/contact">{{ t "footer.company.contact" }}</a></li>
+                        <li><a href="/privacy">{{ t "footer.company.privacy" }}</a></li>
+                        <li><a href="/terms">{{ t "footer.company.terms" }}</a></li>
                     </ul>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; {{ .Year }} OpenHost. All rights reserved.</p>
-                <p>Built with ❤️ using Go</p>
+                <p>{{ t "common.copyright" .Year }}</p>
+                <p>{{ t "common.powered_by" }}</p>
             </div>
         </div>
     </footer>
