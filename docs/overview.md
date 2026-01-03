@@ -5,10 +5,12 @@
 - 处理器聚合多个服务并提供 JSON 接口。
 
 ## domain
-- `internal/domain` 包含 Customer、Order、Invoice、Coupon、Ticket、VPS、IP 等核心实体。
+- `internal/domain` 包含 Tenant、Customer、Order、Invoice、Coupon、Ticket、VPS、IP 等核心实体。
 
 ## service
-- `BillingService` 处理账单与优惠券。
+- `CatalogService` 管理产品目录。
+- `SubscriptionService` 维护订阅与周期性出账。
+- `BillingService` 处理账单、优惠券与收款。
 - `OrderService` 处理订单生命周期。
 - `HostingService` 管理 VPS 与 IP 分配。
 - `SupportService` 管理工单。
