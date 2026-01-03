@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ .Description }}">
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}OpenHost</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="main-content">
+        <section class="section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <h1>OpenHost 安装向导</h1>
+                    <p>快速完成数据库与管理员初始化配置</p>
+                </div>
+
+                {{ if .Success }}
+                <div class="alert alert-success">
+                    {{ .SuccessMessage }}
+                </div>
+                {{ end }}
+
+                {{ if .Errors }}
+                <div class="alert alert-error">
+                    <ul>
+                        {{ range .Errors }}
+                        <li>{{ . }}</li>
+                        {{ end }}
+                    </ul>
+                </div>
+                {{ end }}
+
+                <div class="card" style="max-width: 860px; margin: 0 auto;">
+                    <div class="card-header">
+                        <h2 class="card-title">安装信息</h2>
+                        <p class="card-subtitle">默认内置 SQLite，可切换为 PostgreSQL。</p>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/install" class="form">
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label class="form-label" for="app_name">站点名称</label>
+                                    <input class="form-control" id="app_name" name="app_name" type="text" value="{{ .Form.AppName }}" placeholder="OpenHost" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="base_url">站点地址</label>
+                                    <input class="form-control" id="base_url" name="base_url" type="url" value="{{ .Form.BaseURL }}" placeholder="http://localhost:8080">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-2">
+                                <div class="form-group">
+                                    <label class="form-label" for="admin_email">管理员邮箱</label>
+                                    <input class="form-control" id="admin_email" name="admin_email" type="email" value="{{ .Form.AdminEmail }}" placeholder="admin@example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="admin_password">管理员密码</label>
+                                    <input class="form-control" id="admin_password" name="admin_password" type="password" placeholder="至少 8 位" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="db_type">数据库类型</label>
+                                <select class="form-control" id="db_type" name="db_type">
+                                    <option value="sqlite" {{ if eq .Form.DatabaseType "sqlite" }}selected{{ end }}>SQLite（内置）</option>
+                                    <option value="postgres" {{ if eq .Form.DatabaseType "postgres" }}selected{{ end }}>PostgreSQL</option>
+                                </select>
+                            </div>
+
+                            <div id="sqlite-fields">
+                                <div class="form-group">
+                                    <label class="form-label" for="sqlite_path">SQLite 文件路径</label>
+                                    <input class="form-control" id="sqlite_path" name="sqlite_path" type="text" value="{{ .Form.SQLitePath }}" placeholder="./data/openhost.db">
+                                    <small>安装程序会自动创建目录与数据库文件。</small>
+                                </div>
+                            </div>
+
+                            <div id="postgres-fields">
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_host">PostgreSQL 主机</label>
+                                        <input class="form-control" id="pg_host" name="pg_host" type="text" value="{{ .Form.PostgresHost }}" placeholder="127.0.0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_port">端口</label>
+                                        <input class="form-control" id="pg_port" name="pg_port" type="number" value="{{ .Form.PostgresPort }}" placeholder="5432">
+                                    </div>
+                                </div>
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_user">用户名</label>
+                                        <input class="form-control" id="pg_user" name="pg_user" type="text" value="{{ .Form.PostgresUser }}" placeholder="openhost">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_password">密码</label>
+                                        <input class="form-control" id="pg_password" name="pg_password" type="password" placeholder="数据库密码">
+                                    </div>
+                                </div>
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_database">数据库名称</label>
+                                        <input class="form-control" id="pg_database" name="pg_database" type="text" value="{{ .Form.PostgresDBName }}" placeholder="openhost">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="pg_sslmode">SSL Mode</label>
+                                        <input class="form-control" id="pg_sslmode" name="pg_sslmode" type="text" value="{{ .Form.PostgresSSL }}" placeholder="disable">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 2rem;">
+                                <button class="btn btn-primary btn-lg" type="submit" {{ if .Installed }}disabled{{ end }}>立即安装</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; {{ .Year }} OpenHost. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const dbTypeSelect = document.getElementById('db_type');
+        const sqliteFields = document.getElementById('sqlite-fields');
+        const postgresFields = document.getElementById('postgres-fields');
+
+        const toggleFields = () => {
+            const value = dbTypeSelect.value;
+            sqliteFields.style.display = value === 'sqlite' ? 'block' : 'none';
+            postgresFields.style.display = value === 'postgres' ? 'block' : 'none';
+        };
+
+        dbTypeSelect.addEventListener('change', toggleFields);
+        toggleFields();
+    </script>
+</body>
+</html>

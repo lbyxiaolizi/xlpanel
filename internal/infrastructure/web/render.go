@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
 )
 
 const (
@@ -63,8 +64,11 @@ func (r *Renderer) Render(c *gin.Context, templateName string, data gin.H) {
 		c.AbortWithError(500, err)
 		return
 	}
-	c.Engine.SetHTMLTemplate(tmpl)
-	c.HTML(200, templateName, data)
+	c.Render(200, render.HTML{
+		Template: tmpl,
+		Name:     templateName,
+		Data:     data,
+	})
 }
 
 func (r *Renderer) loadTemplates(theme string) (*template.Template, error) {
