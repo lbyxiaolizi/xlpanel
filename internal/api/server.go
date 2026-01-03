@@ -564,6 +564,27 @@ func (s *Server) handleTenants(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleCustomers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			customers := s.customers.List()
+			rows := make([][]string, 0, len(customers))
+			for _, customer := range customers {
+				rows = append(rows, []string{
+					customer.ID,
+					customer.Name,
+					customer.Email,
+					formatDateTime(customer.CreatedAt),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Customers",
+				Description:  "Review and manage all customer accounts.",
+				Headers:      []string{"ID", "Name", "Email", "Created"},
+				Rows:         rows,
+				EmptyMessage: "No customers found yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.customers.List())
 	case http.MethodPost:
 		var req customerCreate
@@ -592,6 +613,28 @@ func (s *Server) handleCustomers(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleOrders(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			orders := s.orderService.ListOrders()
+			rows := make([][]string, 0, len(orders))
+			for _, order := range orders {
+				rows = append(rows, []string{
+					order.ID,
+					order.CustomerID,
+					order.ProductCode,
+					fmt.Sprintf("%d", order.Quantity),
+					order.Status,
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Orders",
+				Description:  "Track recent orders across all customers.",
+				Headers:      []string{"Order ID", "Customer ID", "Product", "Quantity", "Status"},
+				Rows:         rows,
+				EmptyMessage: "No orders have been created yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.orderService.ListOrders())
 	case http.MethodPost:
 		var req orderCreate
@@ -625,6 +668,27 @@ func (s *Server) handleOrders(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleProducts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			products := s.catalogService.ListProducts()
+			rows := make([][]string, 0, len(products))
+			for _, product := range products {
+				rows = append(rows, []string{
+					product.Code,
+					product.Name,
+					formatCurrencyAmount(product.Currency, product.UnitPrice),
+					formatRecurring(product.Recurring),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Products",
+				Description:  "Manage the product catalog and pricing.",
+				Headers:      []string{"Code", "Name", "Price", "Recurring"},
+				Rows:         rows,
+				EmptyMessage: "No products are available yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.catalogService.ListProducts())
 	case http.MethodPost:
 		var req productCreate
@@ -658,6 +722,28 @@ func (s *Server) handleProducts(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleSubscriptions(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			subscriptions := s.subService.ListSubscriptions()
+			rows := make([][]string, 0, len(subscriptions))
+			for _, subscription := range subscriptions {
+				rows = append(rows, []string{
+					subscription.ID,
+					subscription.CustomerID,
+					subscription.ProductCode,
+					subscription.Status,
+					formatDateTime(subscription.NextBillAt),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Subscriptions",
+				Description:  "Monitor recurring customer subscriptions.",
+				Headers:      []string{"Subscription ID", "Customer ID", "Product", "Status", "Next Bill"},
+				Rows:         rows,
+				EmptyMessage: "No subscriptions are active yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.subService.ListSubscriptions())
 	case http.MethodPost:
 		var req subscriptionCreate
@@ -703,6 +789,28 @@ func (s *Server) handleSubscriptionInvoices(w http.ResponseWriter, r *http.Reque
 func (s *Server) handleInvoices(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			invoices := s.billingService.ListInvoices()
+			rows := make([][]string, 0, len(invoices))
+			for _, invoice := range invoices {
+				rows = append(rows, []string{
+					invoice.ID,
+					invoice.CustomerID,
+					formatCurrencyAmount(invoice.Currency, invoice.Amount),
+					invoice.Status,
+					formatDateTime(invoice.DueAt),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Invoices",
+				Description:  "Review billing invoices and payment status.",
+				Headers:      []string{"Invoice ID", "Customer ID", "Amount", "Status", "Due"},
+				Rows:         rows,
+				EmptyMessage: "No invoices have been issued yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.billingService.ListInvoices())
 	case http.MethodPost:
 		var req invoiceCreate
@@ -794,6 +902,28 @@ func (s *Server) handlePayments(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleVPS(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			vpsInstances := s.hostingService.ListVPS()
+			rows := make([][]string, 0, len(vpsInstances))
+			for _, instance := range vpsInstances {
+				rows = append(rows, []string{
+					instance.ID,
+					instance.Hostname,
+					instance.PlanCode,
+					instance.Status,
+					formatDateTime(instance.CreatedAt),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "VPS Hosting",
+				Description:  "Provisioned VPS instances and their status.",
+				Headers:      []string{"Instance ID", "Hostname", "Plan", "Status", "Created"},
+				Rows:         rows,
+				EmptyMessage: "No VPS instances have been provisioned yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.hostingService.ListVPS())
 	case http.MethodPost:
 		var req vpsCreate
@@ -842,6 +972,27 @@ func (s *Server) handleIPs(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleTickets(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			tickets := s.supportService.ListTickets()
+			rows := make([][]string, 0, len(tickets))
+			for _, ticket := range tickets {
+				rows = append(rows, []string{
+					ticket.ID,
+					ticket.Subject,
+					ticket.Status,
+					formatDateTime(ticket.CreatedAt),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Support Tickets",
+				Description:  "Open and resolved customer support requests.",
+				Headers:      []string{"Ticket ID", "Subject", "Status", "Created"},
+				Rows:         rows,
+				EmptyMessage: "No support tickets have been opened yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.supportService.ListTickets())
 	case http.MethodPost:
 		var req ticketCreate
@@ -866,6 +1017,30 @@ func (s *Server) handleTickets(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleGateways(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			gateways := s.paymentsService.ListGateways()
+			rows := make([][]string, 0, len(gateways))
+			for _, gateway := range gateways {
+				status := "Disabled"
+				if gateway.Enabled {
+					status = "Enabled"
+				}
+				rows = append(rows, []string{
+					gateway.Name,
+					gateway.Provider,
+					status,
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Payment Gateways",
+				Description:  "Manage payment providers and enablement.",
+				Headers:      []string{"Gateway", "Provider", "Status"},
+				Rows:         rows,
+				EmptyMessage: "No payment gateways are configured yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.paymentsService.ListGateways())
 	case http.MethodPost:
 		var req gatewayCreate
@@ -887,6 +1062,26 @@ func (s *Server) handleGateways(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleJobs(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		if wantsHTML(r) {
+			jobs := s.autoService.ListJobs()
+			rows := make([][]string, 0, len(jobs))
+			for _, job := range jobs {
+				rows = append(rows, []string{
+					job.Name,
+					job.Schedule,
+					formatDateTime(job.LastRun),
+				})
+			}
+			s.renderAdminList(w, r, adminListData{
+				Title:        "Automation Jobs",
+				Description:  "Scheduled jobs and their last run times.",
+				Headers:      []string{"Job", "Schedule", "Last Run"},
+				Rows:         rows,
+				EmptyMessage: "No automation jobs have been registered yet.",
+				Count:        len(rows),
+			})
+			return
+		}
 		writeJSON(w, http.StatusOK, s.autoService.ListJobs())
 	case http.MethodPost:
 		var req jobCreate
@@ -918,6 +1113,62 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
+}
+
+type adminListData struct {
+	Title        string
+	Description  string
+	Headers      []string
+	Rows         [][]string
+	EmptyMessage string
+	Count        int
+}
+
+func wantsHTML(r *http.Request) bool {
+	return strings.Contains(r.Header.Get("Accept"), "text/html")
+}
+
+func formatDateTime(t time.Time) string {
+	if t.IsZero() {
+		return "—"
+	}
+	return t.Format("2006-01-02 15:04")
+}
+
+func formatCurrencyAmount(currency string, amount float64) string {
+	if currency == "" {
+		currency = "USD"
+	}
+	return fmt.Sprintf("%s %.2f", currency, amount)
+}
+
+func formatRecurring(recurring bool) string {
+	if recurring {
+		return "Yes"
+	}
+	return "No"
+}
+
+func (s *Server) renderAdminList(w http.ResponseWriter, r *http.Request, data adminListData) {
+	theme := s.config.DefaultTheme
+	if s.config.AllowThemeOverride {
+		if requested := r.URL.Query().Get("theme"); requested != "" {
+			theme = requested
+		}
+	}
+	basePath := filepath.Join("frontend", "themes", theme, "base.html")
+	listPath := filepath.Join("frontend", "themes", theme, "admin", "list.html")
+	tmpl, err := template.ParseFiles(basePath, listPath)
+	if err != nil {
+		log.Printf("Admin template not loaded: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	if err := tmpl.ExecuteTemplate(w, "base.html", data); err != nil {
+		log.Printf("Error executing admin template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 type responseRecorder struct {
