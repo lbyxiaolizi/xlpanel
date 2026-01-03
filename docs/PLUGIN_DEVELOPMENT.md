@@ -520,7 +520,7 @@ Test your plugin with the actual OpenHost application:
 ./plugins/my-provisioner &
 
 # Trigger provisioning
-curl -X POST http://localhost:8080/api/v1/services \
+curl -X POST http://localhost:6421/api/v1/services \
   -H "Content-Type: application/json" \
   -d '{
     "product_id": "123",

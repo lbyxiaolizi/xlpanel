@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	defaultBaseURL  = "http://localhost:8080"
+	defaultBaseURL  = "http://localhost:6421"
 	defaultSQLite   = "./data/openhost.db"
 	defaultPGPort   = 5432
 	minPasswordSize = 8

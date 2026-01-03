@@ -74,9 +74,9 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - SERVER_PORT=8080
+      - SERVER_PORT=6421
     ports:
-      - "8080:8080"
+      - "6421:6421"
     volumes:
       - ./plugins:/app/plugins
       - ./themes:/app/themes
@@ -106,7 +106,7 @@ DB_PASSWORD=your_secure_db_password_here
 REDIS_PASSWORD=your_secure_redis_password_here
 
 # Application
-SERVER_PORT=8080
+SERVER_PORT=6421
 JWT_SECRET=your_jwt_secret_key_here
 ```
 
@@ -188,7 +188,7 @@ spec:
       - name: openhost
         image: openhost/openhost:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 6421
         envFrom:
         - configMapRef:
             name: openhost-config
@@ -218,13 +218,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /api/v1/health
-            port: 8080
+            port: 6421
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /api/v1/health
-            port: 8080
+            port: 6421
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:
@@ -250,7 +250,7 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8080
+    targetPort: 6421
   type: LoadBalancer
 ```
 
@@ -370,7 +370,7 @@ sudo systemctl status openhost
 
 ```nginx
 upstream openhost {
-    server localhost:8080;
+    server localhost:6421;
 }
 
 server {
@@ -498,7 +498,7 @@ gunzip -c backup_20240101_120000.sql.gz | psql -U openhost openhost
 
 ```bash
 # Application health
-curl http://localhost:8080/api/v1/health
+curl http://localhost:6421/api/v1/health
 
 # Expected response
 {"status":"ok"}
@@ -522,7 +522,7 @@ tail -f /var/log/openhost/app.log
 OpenHost exposes Prometheus-compatible metrics at `/metrics`:
 
 ```bash
-curl http://localhost:8080/metrics
+curl http://localhost:6421/metrics
 ```
 
 ## Security Checklist

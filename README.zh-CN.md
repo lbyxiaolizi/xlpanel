@@ -62,11 +62,11 @@ make all
 ./bin/server
 ```
 
-服务将在 `http://localhost:8080` 启动。
+服务将在 `http://localhost:6421` 启动。
 
 API 健康检查：
 ```bash
-curl http://localhost:8080/api/v1/health
+curl http://localhost:6421/api/v1/health
 ```
 
 ## 🔌 插件系统

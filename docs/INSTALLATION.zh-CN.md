@@ -25,7 +25,7 @@ make server
 浏览器访问：
 
 ```
-http://localhost:8080/install
+http://localhost:6421/install
 ```
 
 ## 安装向导步骤

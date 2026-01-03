@@ -10,7 +10,7 @@ OpenHost 提供 RESTful API 用于管理托管服务、计费和客户账户。�
 
 ```
 生产环境: https://api.yourdomain.com/api/v1
-开发环境: http://localhost:8080/api/v1
+开发环境: http://localhost:6421/api/v1
 ```
 
 ## 认证

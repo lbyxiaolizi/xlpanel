@@ -24,5 +24,5 @@ func main() {
 	api := router.Group("/api/v1")
 	api.GET("/health", handlers.Health)
 
-	_ = http.ListenAndServe(":8080", router)
+	_ = http.ListenAndServe(":6421", router)
 }

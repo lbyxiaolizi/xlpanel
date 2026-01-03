@@ -25,7 +25,7 @@ The binary is created at `./bin/server`.
 Open your browser at:
 
 ```
-http://localhost:8080/install
+http://localhost:6421/install
 ```
 
 ## Web installer steps
