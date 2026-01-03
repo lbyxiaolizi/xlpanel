@@ -128,6 +128,7 @@ See [Architecture Documentation](docs/ARCHITECTURE.md) for details.
 
 - [Architecture Design](docs/ARCHITECTURE.md) - System architecture and design principles
 - [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
+- [Installation Guide](docs/INSTALLATION.md) - Web installer walkthrough
 - [Plugin Development](docs/PLUGIN_DEVELOPMENT.md) - How to develop custom plugins
 - [API Documentation](docs/API.md) - RESTful API reference
 - [Contributing Guidelines](docs/CONTRIBUTING.md) - How to contribute to the project

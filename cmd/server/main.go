@@ -17,6 +17,10 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery())
 
+	router.Static("/static", "./themes/default/assets")
+	router.GET("/install", handlers.InstallForm)
+	router.POST("/install", handlers.InstallSubmit)
+
 	api := router.Group("/api/v1")
 	api.GET("/health", handlers.Health)
 

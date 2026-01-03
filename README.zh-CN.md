@@ -128,6 +128,7 @@ openhost/
 
 - [架构设计](docs/ARCHITECTURE.zh-CN.md) - 系统架构和设计原则
 - [部署指南](docs/DEPLOYMENT.zh-CN.md) - 生产环境部署说明
+- [安装指南](docs/INSTALLATION.zh-CN.md) - Web 安装向导说明
 - [插件开发](docs/PLUGIN_DEVELOPMENT.zh-CN.md) - 如何开发自定义插件
 - [API 文档](docs/API.zh-CN.md) - RESTful API 参考
 - [贡献指南](docs/CONTRIBUTING.zh-CN.md) - 如何参与项目开发
