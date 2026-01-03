@@ -15,7 +15,7 @@
                         </linearGradient>
                     </defs>
                 </svg>
-                <span>OpenHost</span>
+                <span>{{ t "common.app_name" }}</span>
             </a>
         </div>
         
@@ -29,7 +29,7 @@
                             <rect x="14" y="14" width="7" height="7" rx="1"/>
                             <rect x="3" y="14" width="7" height="7" rx="1"/>
                         </svg>
-                        <span>控制面板</span>
+                        <span>{{ t "client.dashboard.title" }}</span>
                     </a>
                 </li>
                 <li>
@@ -39,7 +39,7 @@
                             <line x1="8" y1="21" x2="16" y2="21"/>
                             <line x1="12" y1="17" x2="12" y2="21"/>
                         </svg>
-                        <span>我的服务</span>
+                        <span>{{ t "client.services.title" }}</span>
                     </a>
                 </li>
                 <li>
@@ -50,7 +50,7 @@
                             <line x1="16" y1="13" x2="8" y2="13"/>
                             <line x1="16" y1="17" x2="8" y2="17"/>
                         </svg>
-                        <span>账单</span>
+                        <span>{{ t "client.invoices.title" }}</span>
                     </a>
                 </li>
                 <li>
@@ -58,7 +58,7 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
-                        <span>工单支持</span>
+                        <span>{{ t "client.tickets.title" }}</span>
                     </a>
                 </li>
                 <li>
@@ -67,7 +67,7 @@
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
-                        <span>个人资料</span>
+                        <span>{{ t "client.profile.title" }}</span>
                     </a>
                 </li>
             </ul>
@@ -80,7 +80,7 @@
                     <circle cx="20" cy="21" r="1"/>
                     <path d="m1 1 4 4h16l-2.5 7H7.1"/>
                 </svg>
-                <span>选购产品</span>
+                <span>{{ t "nav.products" }}</span>
             </a>
             <a href="/logout" class="sidebar-link logout">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -88,7 +88,7 @@
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" y1="12" x2="9" y2="12"/>
                 </svg>
-                <span>退出登录</span>
+                <span>{{ t "nav.logout" }}</span>
             </a>
         </div>
     </aside>
@@ -97,22 +97,30 @@
     <main class="client-main">
         <header class="client-header">
             <div class="header-left">
-                <button class="sidebar-toggle" id="sidebarToggle">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="12" x2="21" y2="12"/>
                         <line x1="3" y1="6" x2="21" y2="6"/>
                         <line x1="3" y1="18" x2="21" y2="18"/>
                     </svg>
                 </button>
-                <h1>欢迎回来！</h1>
+                <h1>{{ if .User }}{{ t "client.dashboard.welcome" .User.FirstName }}{{ else }}{{ t "client.dashboard.title" }}{{ end }}</h1>
             </div>
             <div class="header-right">
+                <!-- Language Switcher -->
+                <div class="lang-switcher">
+                    {{ if eq .Lang "zh" }}
+                    <a href="?lang=en" class="lang-link" title="English">EN</a>
+                    {{ else }}
+                    <a href="?lang=zh" class="lang-link" title="中文">中文</a>
+                    {{ end }}
+                </div>
                 <div class="user-menu">
                     <button class="user-menu-toggle">
                         <div class="user-avatar">
-                            <span>U</span>
+                            <span>{{ if .User }}{{ slice .User.FirstName 0 1 }}{{ else }}U{{ end }}</span>
                         </div>
-                        <span class="user-name">User</span>
+                        <span class="user-name">{{ if .User }}{{ .User.FirstName }}{{ else }}User{{ end }}</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6 9 12 15 18 9"/>
                         </svg>
@@ -134,7 +142,7 @@
                     </div>
                     <div class="stat-info">
                         <span class="stat-value" id="activeServices">0</span>
-                        <span class="stat-label">活跃服务</span>
+                        <span class="stat-label">{{ t "client.dashboard.active_services" }}</span>
                     </div>
                 </div>
                 
@@ -147,7 +155,7 @@
                     </div>
                     <div class="stat-info">
                         <span class="stat-value" id="unpaidInvoices">0</span>
-                        <span class="stat-label">待付账单</span>
+                        <span class="stat-label">{{ t "client.dashboard.pending_invoices" }}</span>
                     </div>
                 </div>
                 
@@ -159,7 +167,7 @@
                     </div>
                     <div class="stat-info">
                         <span class="stat-value" id="openTickets">0</span>
-                        <span class="stat-label">开放工单</span>
+                        <span class="stat-label">{{ t "client.dashboard.open_tickets" }}</span>
                     </div>
                 </div>
                 
@@ -172,7 +180,7 @@
                     </div>
                     <div class="stat-info">
                         <span class="stat-value" id="accountCredit">¥0.00</span>
-                        <span class="stat-label">账户余额</span>
+                        <span class="stat-label">{{ t "client.dashboard.account_credit" }}</span>
                     </div>
                 </div>
             </div>
@@ -181,8 +189,8 @@
             <div class="dashboard-grid">
                 <div class="dashboard-card">
                     <div class="card-header">
-                        <h2>我的服务</h2>
-                        <a href="/client/services" class="card-link">查看全部</a>
+                        <h2>{{ t "client.services.title" }}</h2>
+                        <a href="/client/services" class="card-link">{{ t "client.dashboard.view_all" }}</a>
                     </div>
                     <div class="card-body">
                         <div class="services-list" id="servicesList">
@@ -192,8 +200,8 @@
                                     <line x1="8" y1="21" x2="16" y2="21"/>
                                     <line x1="12" y1="17" x2="12" y2="21"/>
                                 </svg>
-                                <p>您还没有任何服务</p>
-                                <a href="/products" class="btn btn-primary btn-sm">立即选购</a>
+                                <p>{{ t "client.services.no_services" }}</p>
+                                <a href="/products" class="btn btn-primary btn-sm">{{ t "client.services.browse" }}</a>
                             </div>
                         </div>
                     </div>
@@ -201,8 +209,8 @@
                 
                 <div class="dashboard-card">
                     <div class="card-header">
-                        <h2>最近账单</h2>
-                        <a href="/client/invoices" class="card-link">查看全部</a>
+                        <h2>{{ t "client.invoices.title" }}</h2>
+                        <a href="/client/invoices" class="card-link">{{ t "client.dashboard.view_all" }}</a>
                     </div>
                     <div class="card-body">
                         <div class="invoices-list" id="invoicesList">
@@ -211,7 +219,7 @@
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                     <polyline points="14 2 14 8 20 8"/>
                                 </svg>
-                                <p>暂无账单记录</p>
+                                <p>{{ t "client.invoices.no_invoices" }}</p>
                             </div>
                         </div>
                     </div>
@@ -220,7 +228,7 @@
             
             <!-- Quick Actions -->
             <div class="quick-actions">
-                <h2>快捷操作</h2>
+                <h2>{{ t "client.dashboard.quick_actions" }}</h2>
                 <div class="actions-grid">
                     <a href="/products" class="action-card">
                         <div class="action-icon">
@@ -230,7 +238,7 @@
                                 <path d="m1 1 4 4h16l-2.5 7H7.1"/>
                             </svg>
                         </div>
-                        <span>订购新服务</span>
+                        <span>{{ t "products.order_now" }}</span>
                     </a>
                     <a href="/client/tickets/new" class="action-card">
                         <div class="action-icon">
@@ -238,7 +246,7 @@
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
                         </div>
-                        <span>提交工单</span>
+                        <span>{{ t "client.tickets.new_ticket" }}</span>
                     </a>
                     <a href="/client/profile" class="action-card">
                         <div class="action-icon">
@@ -247,7 +255,7 @@
                                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                             </svg>
                         </div>
-                        <span>账户设置</span>
+                        <span>{{ t "client.profile.title" }}</span>
                     </a>
                     <a href="/docs" class="action-card">
                         <div class="action-icon">
@@ -256,7 +264,7 @@
                                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                             </svg>
                         </div>
-                        <span>帮助文档</span>
+                        <span>{{ t "nav.docs" }}</span>
                     </a>
                 </div>
             </div>
