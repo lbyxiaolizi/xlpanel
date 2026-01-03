@@ -96,3 +96,39 @@ func ClientProfile(c *gin.Context) {
 		"Section":     "profile",
 	})
 }
+
+func ClientAffiliates(c *gin.Context) {
+	web.Render(c, "client/affiliates.html", gin.H{
+		"Title":       "推广联盟",
+		"Description": "管理您的推广联盟账户",
+		"Year":        time.Now().Year(),
+		"Section":     "affiliates",
+	})
+}
+
+func ClientDomains(c *gin.Context) {
+	web.Render(c, "client/domains.html", gin.H{
+		"Title":       "域名管理",
+		"Description": "管理您的域名",
+		"Year":        time.Now().Year(),
+		"Section":     "domains",
+	})
+}
+
+func ClientSubUsers(c *gin.Context) {
+	web.Render(c, "client/subusers.html", gin.H{
+		"Title":       "子用户管理",
+		"Description": "管理您的子用户",
+		"Year":        time.Now().Year(),
+		"Section":     "subusers",
+	})
+}
+
+func ClientSecurity(c *gin.Context) {
+	web.Render(c, "client/security.html", gin.H{
+		"Title":       "账户安全",
+		"Description": "管理您的账户安全设置",
+		"Year":        time.Now().Year(),
+		"Section":     "security",
+	})
+}

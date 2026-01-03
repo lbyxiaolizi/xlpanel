@@ -48,6 +48,10 @@ func main() {
 	router.GET("/client/tickets/:id", handlers.ClientTicketDetail)
 	router.GET("/client/tickets/new", handlers.ClientNewTicket)
 	router.GET("/client/profile", handlers.ClientProfile)
+	router.GET("/client/affiliates", handlers.ClientAffiliates)
+	router.GET("/client/domains", handlers.ClientDomains)
+	router.GET("/client/subusers", handlers.ClientSubUsers)
+	router.GET("/client/security", handlers.ClientSecurity)
 	
 	// Admin panel routes
 	router.GET("/admin", handlers.AdminDashboard)
