@@ -2,7 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"html/template"
+	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"xlpanel/internal/core"
@@ -58,6 +61,7 @@ func NewServer(
 
 func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", s.handleIndex)
 	mux.HandleFunc("/health", s.handleHealth)
 	mux.HandleFunc("/tenants", s.handleTenants)
 	mux.HandleFunc("/customers", s.handleCustomers)
@@ -177,6 +181,38 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 		"theme":   s.config.DefaultTheme,
 	}
 	writeJSON(w, http.StatusOK, payload)
+}
+
+func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	// Build theme path
+	themePath := filepath.Join("frontend", "themes", s.config.DefaultTheme)
+	basePath := filepath.Join(themePath, "base.html")
+	homePath := filepath.Join(themePath, "home.html")
+
+	// Parse templates
+	tmpl, err := template.ParseFiles(basePath, homePath)
+	if err != nil {
+		log.Printf("Error parsing templates: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare data
+	data := map[string]string{
+		"Title": "Dashboard",
+	}
+
+	// Execute template
+	if err := tmpl.ExecuteTemplate(w, "base.html", data); err != nil {
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) handleTenants(w http.ResponseWriter, r *http.Request) {
