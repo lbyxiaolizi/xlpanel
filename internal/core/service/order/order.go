@@ -141,6 +141,25 @@ func (s *Service) ListOrders(customerID uint64, limit, offset int) ([]domain.Ord
 	return orders, total, nil
 }
 
+// ListAllOrders returns all orders in the system (admin only)
+func (s *Service) ListAllOrders(status domain.OrderStatus, limit, offset int) ([]domain.Order, int64, error) {
+	var orders []domain.Order
+	var total int64
+
+	query := s.db.Model(&domain.Order{})
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+	query.Count(&total)
+
+	if err := query.Preload("Items").Preload("Customer").Order("created_at DESC").
+		Limit(limit).Offset(offset).Find(&orders).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return orders, total, nil
+}
+
 // UpdateOrderStatus updates the status of an order
 func (s *Service) UpdateOrderStatus(orderID uint64, status domain.OrderStatus) error {
 	return s.db.Model(&domain.Order{}).Where("id = ?", orderID).

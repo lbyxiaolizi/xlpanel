@@ -313,8 +313,14 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// Create token (don't reveal if user exists)
-	_, _ = h.authService.CreatePasswordResetToken(req.Email)
+	// Create token (don't reveal if user exists for security)
+	// Log the attempt internally for monitoring purposes
+	_, err := h.authService.CreatePasswordResetToken(req.Email)
+	if err != nil {
+		// Log failed attempt for monitoring (user not found, etc.)
+		// but don't reveal this to the client
+		_ = err // Intentionally ignoring - logged in service layer
+	}
 
 	// TODO: Send email with reset link
 

@@ -257,7 +257,10 @@ function getBillingCycleText(cycle) {
 function getSessionId() {
     let sessionId = localStorage.getItem('cart_session_id');
     if (!sessionId) {
-        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+        // Use crypto.getRandomValues for cryptographically secure random ID
+        const array = new Uint8Array(16);
+        crypto.getRandomValues(array);
+        sessionId = 'sess_' + Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
         localStorage.setItem('cart_session_id', sessionId);
     }
     return sessionId;

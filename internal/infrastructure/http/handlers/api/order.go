@@ -487,10 +487,9 @@ func (h *OrderHandler) ClearCart(c *gin.Context) {
 // @Router /api/v1/admin/orders [get]
 func (h *OrderHandler) AdminListOrders(c *gin.Context) {
 	limit, offset := PaginationParams(c)
+	status := domain.OrderStatus(c.Query("status"))
 
-	// For admin, list all orders (customer ID = 0)
-	// In production, you'd want a separate admin method
-	orders, total, err := h.orderService.ListOrders(0, limit, offset)
+	orders, total, err := h.orderService.ListAllOrders(status, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to fetch orders"})
 		return

@@ -429,9 +429,14 @@ async function loadDashboardStats() {
         const ticketsRes = await fetch('/api/v1/admin/tickets/stats');
         if (ticketsRes.ok) {
             const data = await ticketsRes.json();
-            document.getElementById('openTickets').textContent = data.open || 0;
+            const openTicketsEl = document.getElementById('openTickets');
+            if (openTicketsEl) {
+                openTicketsEl.textContent = data.open || 0;
+            }
             const badge = document.getElementById('ticketBadge');
-            if (data.open > 0) badge.textContent = data.open;
+            if (badge && data.open > 0) {
+                badge.textContent = data.open;
+            }
         }
     } catch (error) {
         console.error('Error loading stats:', error);
