@@ -25,6 +25,104 @@ OpenHost uses a plugin-based architecture for provisioning modules. Plugins are 
 - **Language Agnostic**: Write plugins in any language with gRPC support
 - **Security**: SHA-256 checksum verification
 - **Versioning**: Multiple plugin versions can coexist
+- **Lifecycle Management**: Enable/disable plugins dynamically
+- **Event System**: Subscribe to plugin events
+
+## Plugin Manager API
+
+The enhanced Plugin Manager provides comprehensive lifecycle management:
+
+### Loading and Enabling Plugins
+
+```go
+import "github.com/openhost/openhost/internal/infrastructure/plugin"
+
+// Create plugin manager
+manager := plugin.NewPluginManager("./plugins", logger)
+
+// Enable a plugin
+err := manager.EnablePlugin("my_plugin")
+
+// Get plugin state
+state := manager.GetPluginState("my_plugin")
+fmt.Printf("Status: %s\n", state.Status)  // active, inactive, error, loading
+```
+
+### Plugin Events
+
+Subscribe to plugin lifecycle events:
+
+```go
+manager.OnEvent(func(event plugin.PluginEvent) {
+    switch event.Type {
+    case plugin.EventPluginLoaded:
+        fmt.Printf("Plugin %s loaded at %s\n", event.Plugin, event.Timestamp)
+    case plugin.EventPluginUnloaded:
+        fmt.Printf("Plugin %s unloaded\n", event.Plugin)
+    case plugin.EventPluginError:
+        fmt.Printf("Plugin %s error: %s\n", event.Plugin, event.Error)
+    case plugin.EventPluginConfigured:
+        fmt.Printf("Plugin %s configured\n", event.Plugin)
+    case plugin.EventProvisionStart:
+        fmt.Printf("Provisioning started for %s\n", event.Plugin)
+    case plugin.EventProvisionComplete:
+        fmt.Printf("Provisioning completed for %s\n", event.Plugin)
+    case plugin.EventProvisionError:
+        fmt.Printf("Provisioning failed for %s: %s\n", event.Plugin, event.Error)
+    }
+})
+```
+
+### Plugin Configuration
+
+```go
+// Set plugin configuration
+manager.SetPluginConfig("my_plugin", map[string]string{
+    "api_url": "https://api.example.com",
+    "api_key": "your-secret-key",
+})
+
+// Get plugin configuration
+config := manager.GetPluginConfig("my_plugin")
+
+// Save all configurations to disk
+manager.SaveConfigs("./config/plugins.json")
+
+// Load configurations from disk
+manager.LoadConfigs("./config/plugins.json")
+```
+
+### Plugin State Tracking
+
+```go
+// Get all plugin states
+states := manager.GetAllStates()
+for name, state := range states {
+    fmt.Printf("Plugin: %s\n", name)
+    fmt.Printf("  Status: %s\n", state.Status)
+    fmt.Printf("  Path: %s\n", state.Path)
+    if state.LoadedAt != nil {
+        fmt.Printf("  Loaded: %s\n", state.LoadedAt)
+    }
+    fmt.Printf("  Use Count: %d\n", state.UseCount)
+}
+
+// Scan with detailed info
+plugins, _ := manager.ScanWithInfo()
+for _, plugin := range plugins {
+    fmt.Printf("%s: %s\n", plugin.Info.Name, plugin.Status)
+}
+```
+
+### Disabling Plugins
+
+```go
+// Disable a plugin
+err := manager.DisablePlugin("my_plugin")
+if err != nil {
+    log.Printf("Failed to disable: %v", err)
+}
+```
 
 ## Getting Started
 

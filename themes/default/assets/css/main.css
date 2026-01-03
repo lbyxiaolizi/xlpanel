@@ -235,7 +235,28 @@ p {
 
 .navbar-actions {
     display: flex;
+    align-items: center;
     gap: var(--spacing-md);
+}
+
+/* Language Switcher */
+.lang-switcher {
+    display: flex;
+    align-items: center;
+}
+
+.lang-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.lang-link:hover {
+    color: var(--primary);
+    background-color: var(--bg-secondary);
 }
 
 /* ==========================================================================
