@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"xlpanel/internal/core"
@@ -69,8 +70,14 @@ func NewServer(
 
 func (s *Server) loadTemplates() error {
 	// Validate theme name to prevent path traversal
-	theme := filepath.Base(s.config.DefaultTheme)
-	if theme != s.config.DefaultTheme {
+	theme := s.config.DefaultTheme
+	// Check for empty, path separators, or relative path components
+	if theme == "" || 
+	   filepath.Base(theme) != theme || 
+	   theme == "." || 
+	   theme == ".." ||
+	   strings.Contains(theme, "/") ||
+	   strings.Contains(theme, "\\") {
 		return filepath.ErrBadPattern
 	}
 
