@@ -18,6 +18,10 @@ func main() {
 	router.Use(gin.Recovery())
 
 	router.Static("/static", "./themes/default/assets")
+	router.GET("/", handlers.Root)
+	router.GET("/home", handlers.Home)
+	router.GET("/products", handlers.Products)
+	router.GET("/dashboard", handlers.Dashboard)
 	router.GET("/install", handlers.InstallForm)
 	router.POST("/install", handlers.InstallSubmit)
 

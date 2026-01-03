@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -45,6 +46,10 @@ func InstallForm(c *gin.Context) {
 		})
 		return
 	}
+	if installed {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 	data := installViewData{
 		Installed: installed,
 		Form: installForm{
@@ -52,10 +57,6 @@ func InstallForm(c *gin.Context) {
 			SQLitePath:   defaultSQLite,
 			BaseURL:      defaultBaseURL,
 		},
-	}
-	if installed {
-		data.Success = true
-		data.SuccessMessage = "系统已完成安装。若需重新安装，请删除 config/openhost.json 与数据库文件。"
 	}
 	renderInstall(c, data)
 }
@@ -69,10 +70,7 @@ func InstallSubmit(c *gin.Context) {
 		return
 	}
 	if installed {
-		renderInstall(c, installViewData{
-			Installed: true,
-			Errors:    []string{"系统已安装，无法重复执行安装。"},
-		})
+		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
 
@@ -117,11 +115,7 @@ func InstallSubmit(c *gin.Context) {
 		renderInstall(c, data)
 		return
 	}
-
-	data.Success = true
-	data.SuccessMessage = "安装完成！配置已写入 config/openhost.json。"
-	data.Installed = true
-	renderInstall(c, data)
+	c.Redirect(http.StatusSeeOther, "/dashboard")
 }
 
 type installViewData struct {
