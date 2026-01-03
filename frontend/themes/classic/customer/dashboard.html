@@ -1,0 +1,166 @@
+{{define "content"}}
+<div class="space-y-6">
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm p-8 text-white">
+        <h2 class="text-3xl font-bold mb-2">{{.T "dashboard.welcome"}}, {{.User.Name}}!</h2>
+        <p class="text-blue-100">
+            {{if eq .Lang "zh"}}欢迎回到您的客户面板{{else}}Welcome back to your customer portal{{end}}
+        </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-green-100 rounded-lg">
+                    <i class="fas fa-server text-2xl text-green-600"></i>
+                </div>
+            </div>
+            <h3 class="text-gray-500 text-sm font-medium mb-1">{{.T "dashboard.active_services"}}</h3>
+            <p class="text-3xl font-bold text-gray-800" id="activeServices">0</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                    <i class="fas fa-shopping-cart text-2xl text-blue-600"></i>
+                </div>
+            </div>
+            <h3 class="text-gray-500 text-sm font-medium mb-1">{{.T "cart.item"}}</h3>
+            <p class="text-3xl font-bold text-gray-800" id="cartItems">0</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-yellow-100 rounded-lg">
+                    <i class="fas fa-file-invoice-dollar text-2xl text-yellow-600"></i>
+                </div>
+            </div>
+            <h3 class="text-gray-500 text-sm font-medium mb-1">{{.T "dashboard.unpaid_invoices"}}</h3>
+            <p class="text-3xl font-bold text-gray-800" id="unpaidInvoices">0</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+            {{if eq .Lang "zh"}}快捷操作{{else}}Quick Actions{{end}}
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/customer/products" class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all group">
+                <span class="flex items-center text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                    <i class="fas fa-shopping-bag mr-3 text-blue-600"></i>
+                    {{.T "products.select"}}
+                </span>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-600"></i>
+            </a>
+            <a href="/customer/cart" class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all group">
+                <span class="flex items-center text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                    <i class="fas fa-shopping-cart mr-3 text-green-600"></i>
+                    {{.T "cart.title"}}
+                </span>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-600"></i>
+            </a>
+            <a href="/customer/invoices" class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all group">
+                <span class="flex items-center text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                    <i class="fas fa-file-invoice mr-3 text-purple-600"></i>
+                    {{.T "invoices.title"}}
+                </span>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-600"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-history text-blue-600 mr-2"></i>{{.T "orders.title"}}
+            </h3>
+            <a href="/customer/orders" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                {{if eq .Lang "zh"}}查看全部{{else}}View All{{end}}
+            </a>
+        </div>
+        <div id="recentOrders">
+            <p class="text-center text-gray-500 py-8">{{.T "msg.loading"}}</p>
+        </div>
+    </div>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+
+async function loadDashboardData() {
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    try {
+        // Load cart
+        const cartResponse = await fetch('/api/cart', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (cartResponse.ok) {
+            const cart = await cartResponse.json();
+            document.getElementById('cartItems').textContent = cart.items ? cart.items.length : 0;
+        }
+
+        // Load orders
+        const ordersResponse = await fetch('/orders', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (ordersResponse.ok) {
+            const orders = await ordersResponse.json();
+            document.getElementById('activeServices').textContent = orders.length || 0;
+            renderRecentOrders(orders.slice(0, 5));
+        }
+
+        // Note: In a real app, you'd have an endpoint to get unpaid invoices count
+        document.getElementById('unpaidInvoices').textContent = '0';
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+function renderRecentOrders(orders) {
+    const container = document.getElementById('recentOrders');
+    
+    if (!orders || orders.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">{{.T "msg.no_data"}}</p>';
+        return;
+    }
+
+    let html = '<div class="space-y-3">';
+    orders.forEach(order => {
+        const statusColor = order.status === 'completed' ? 'green' : order.status === 'pending' ? 'yellow' : 'gray';
+        html += `
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-box text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${order.product_code}</p>
+                        <p class="text-xs text-gray-500">${new Date(order.created_at).toLocaleDateString()}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-${statusColor}-100 text-${statusColor}-800">
+                        ${order.status}
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">{{.T "cart.quantity"}}: ${order.quantity}</p>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+// Load dashboard data on page load
+loadDashboardData();
+</script>
+{{end}}

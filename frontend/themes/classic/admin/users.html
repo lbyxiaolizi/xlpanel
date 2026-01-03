@@ -1,0 +1,185 @@
+{{define "content"}}
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">
+                {{if eq .Lang "zh"}}用户管理{{else}}User Management{{end}}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                {{if eq .Lang "zh"}}管理系统用户和权限{{else}}Manage system users and permissions{{end}}
+            </p>
+        </div>
+        <button onclick="showAddUserModal()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center">
+            <i class="fas fa-user-plus mr-2"></i>
+            {{if eq .Lang "zh"}}添加用户{{else}}Add User{{end}}
+        </button>
+    </div>
+
+    <!-- Users List -->
+    <div id="usersContainer">
+        <p class="text-center text-gray-500 py-8">{{.T "msg.loading"}}</p>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="addUserModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                {{if eq .Lang "zh"}}添加新用户{{else}}Add New User{{end}}
+            </h3>
+            <form id="addUserForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">{{.T "auth.email"}}</label>
+                    <input type="email" name="email" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">{{.T "auth.name"}}</label>
+                    <input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">{{.T "auth.password"}}</label>
+                    <input type="password" name="password" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">
+                        {{if eq .Lang "zh"}}角色{{else}}Role{{end}}
+                    </label>
+                    <select name="role" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                        <option value="customer">{{if eq .Lang "zh"}}客户{{else}}Customer{{end}}</option>
+                        <option value="admin">{{if eq .Lang "zh"}}管理员{{else}}Admin{{end}}</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="hideAddUserModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                        {{.T "common.cancel"}}
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        {{.T "common.add"}}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadUsers() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch('/api/users', {
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'X-API-Key': '' 
+            }
+        });
+        
+        if (response.ok) {
+            const users = await response.json();
+            renderUsers(users);
+        } else {
+            renderUsers([]);
+        }
+    } catch (error) {
+        console.error('Error loading users:', error);
+        renderUsers([]);
+    }
+}
+
+function renderUsers(users) {
+    const container = document.getElementById('usersContainer');
+    
+    if (!users || users.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                <p class="text-xl text-gray-600">{{.T "msg.no_data"}}</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<div class="overflow-x-auto">';
+    html += '<table class="min-w-full divide-y divide-gray-200">';
+    html += `
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{.T "auth.name"}}</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{.T "auth.email"}}</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{if eq .Lang "zh"}}角色{{else}}Role{{end}}</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2FA</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{if eq .Lang "zh"}}创建时间{{else}}Created{{end}}</th>
+            </tr>
+        </thead>
+    `;
+    html += '<tbody class="bg-white divide-y divide-gray-200">';
+    
+    users.forEach(user => {
+        const roleColor = user.role === 'admin' ? 'blue' : 'green';
+        const twoFAStatus = user.two_factor_enabled ? 
+            '<span class="text-green-600"><i class="fas fa-check-circle"></i></span>' :
+            '<span class="text-gray-400"><i class="fas fa-times-circle"></i></span>';
+        
+        html += `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${user.email}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-${roleColor}-100 text-${roleColor}-800">
+                        ${user.role}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${twoFAStatus}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${new Date(user.created_at).toLocaleDateString()}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+function showAddUserModal() {
+    document.getElementById('addUserModal').classList.remove('hidden');
+}
+
+function hideAddUserModal() {
+    document.getElementById('addUserModal').classList.add('hidden');
+    document.getElementById('addUserForm').reset();
+}
+
+document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        email: formData.get('email'),
+        name: formData.get('name'),
+        password: formData.get('password'),
+        tenant_id: 'default'
+    };
+    
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            alert('{{.T "msg.success"}}');
+            hideAddUserModal();
+            loadUsers();
+        } else {
+            alert('{{.T "msg.error"}}');
+        }
+    } catch (error) {
+        console.error('Error adding user:', error);
+        alert('{{.T "msg.error"}}');
+    }
+});
+
+loadUsers();
+</script>
+{{end}}

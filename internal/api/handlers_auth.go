@@ -327,3 +327,52 @@ func (s *Server) loadSingleTemplate(theme, templateName string) (*template.Templ
 	// Fall back to regular template
 	return template.ParseFiles(templatePath)
 }
+
+// handleAdminUsers renders the admin users management page
+func (s *Server) handleAdminUsers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	user := s.getUserFromRequest(r)
+	if user == nil || user.Role != "admin" {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	lang := r.URL.Query().Get("lang")
+	if lang == "" {
+		lang = "en"
+	}
+
+	translator := i18n.NewTranslator()
+	
+	data := map[string]interface{}{
+		"Title": translator.T(lang, "nav.account"),
+		"Lang":  lang,
+		"User":  user,
+		"T": func(key string) string {
+			return translator.T(lang, key)
+		},
+	}
+
+	s.renderTemplate(w, r, "admin/users.html", data)
+}
+
+// handleUsersAPI handles the API endpoint for listing users
+func (s *Server) handleUsersAPI(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	user := s.getUserFromRequest(r)
+	if user == nil || user.Role != "admin" {
+		writeError(w, http.StatusForbidden, "forbidden")
+		return
+	}
+
+	users := s.authService.ListUsers()
+	writeJSON(w, http.StatusOK, users)
+}

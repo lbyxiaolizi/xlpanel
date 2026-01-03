@@ -157,6 +157,9 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/customer/orders", s.handleCustomerOrders)
 	mux.HandleFunc("/customer/invoices", s.handleCustomerInvoices)
 	
+	// Admin routes
+	mux.HandleFunc("/admin/users", s.handleAdminUsers)
+	
 	// Cart API routes
 	mux.HandleFunc("/api/cart", s.handleCartGet)
 	mux.HandleFunc("/api/cart/add", s.handleCartAdd)
@@ -164,6 +167,9 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/api/cart/remove", s.handleCartRemove)
 	mux.HandleFunc("/api/cart/clear", s.handleCartClear)
 	mux.HandleFunc("/api/cart/checkout", s.handleCartCheckout)
+	
+	// User API routes
+	mux.HandleFunc("/api/users", s.handleUsersAPI)
 	
 	return s.applyMiddlewares(mux)
 }
