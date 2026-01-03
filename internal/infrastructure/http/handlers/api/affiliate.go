@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 
+	"github.com/openhost/openhost/internal/core/domain"
 	"github.com/openhost/openhost/internal/core/service/affiliate"
 )
 
@@ -312,17 +313,21 @@ type UpdateAffiliateSettingsRequest struct {
 
 // AdminListAffiliates lists all affiliates (admin only)
 func (h *AffiliateHandler) AdminListAffiliates(c *gin.Context) {
-	status := c.Query("status")
+	statusStr := c.Query("status")
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "20"))
 	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
 
-	affiliates, total, err := h.service.ListAffiliates("", limit, offset)
+	// Convert string to AffiliateStatus
+	var status domain.AffiliateStatus
+	if statusStr != "" {
+		status = domain.AffiliateStatus(statusStr)
+	}
+
+	affiliates, total, err := h.service.ListAffiliates(status, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	_ = status // Can be used to filter
 
 	c.JSON(http.StatusOK, gin.H{
 		"affiliates": affiliates,

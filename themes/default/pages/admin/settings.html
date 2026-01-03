@@ -1,0 +1,404 @@
+{{define "title"}}System Settings - Admin - {{.Config.SiteName}}{{end}}
+
+{{define "content"}}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">System Settings</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+        <li class="breadcrumb-item active">Settings</li>
+    </ol>
+
+    <div class="row">
+        <!-- Settings Navigation -->
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="list-group list-group-flush">
+                    <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                        <i class="fas fa-cog me-2"></i> General
+                    </a>
+                    <a href="#company" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-building me-2"></i> Company
+                    </a>
+                    <a href="#localization" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-globe me-2"></i> Localization
+                    </a>
+                    <a href="#ordering" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-shopping-cart me-2"></i> Ordering
+                    </a>
+                    <a href="#billing" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-file-invoice me-2"></i> Billing
+                    </a>
+                    <a href="#support" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-headset me-2"></i> Support
+                    </a>
+                    <a href="#email" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-envelope me-2"></i> Email
+                    </a>
+                    <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-shield-alt me-2"></i> Security
+                    </a>
+                    <a href="#cron" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-clock me-2"></i> Cron Jobs
+                    </a>
+                    <a href="#modules" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                        <i class="fas fa-puzzle-piece me-2"></i> Modules
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- General Settings -->
+                <div class="tab-pane fade show active" id="general">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">General Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="generalSettingsForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Site Name</label>
+                                    <input type="text" class="form-control" name="site_name" value="{{.Settings.SiteName}}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Site URL</label>
+                                    <input type="url" class="form-control" name="site_url" value="{{.Settings.SiteURL}}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Logo URL</label>
+                                    <input type="text" class="form-control" name="logo_url" value="{{.Settings.LogoURL}}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Favicon URL</label>
+                                    <input type="text" class="form-control" name="favicon_url" value="{{.Settings.FaviconURL}}">
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="maintenance_mode" id="maintenanceMode" {{if .Settings.MaintenanceMode}}checked{{end}}>
+                                    <label class="form-check-label" for="maintenanceMode">Maintenance Mode</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Settings -->
+                <div class="tab-pane fade" id="company">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Company Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="companySettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Company Name</label>
+                                        <input type="text" class="form-control" name="company_name" value="{{.Settings.CompanyName}}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Tax/VAT Number</label>
+                                        <input type="text" class="form-control" name="tax_number" value="{{.Settings.TaxNumber}}">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" name="address" rows="3">{{.Settings.Address}}</textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" name="city" value="{{.Settings.City}}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">State/Province</label>
+                                        <input type="text" class="form-control" name="state" value="{{.Settings.State}}">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Postal Code</label>
+                                        <input type="text" class="form-control" name="postal_code" value="{{.Settings.PostalCode}}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Country</label>
+                                        <select class="form-select" name="country">
+                                            <option value="US" {{if eq .Settings.Country "US"}}selected{{end}}>United States</option>
+                                            <option value="GB" {{if eq .Settings.Country "GB"}}selected{{end}}>United Kingdom</option>
+                                            <option value="CA" {{if eq .Settings.Country "CA"}}selected{{end}}>Canada</option>
+                                            <option value="DE" {{if eq .Settings.Country "DE"}}selected{{end}}>Germany</option>
+                                            <option value="FR" {{if eq .Settings.Country "FR"}}selected{{end}}>France</option>
+                                            <!-- Add more countries -->
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" name="phone" value="{{.Settings.Phone}}">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Localization Settings -->
+                <div class="tab-pane fade" id="localization">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Localization</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="localizationSettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Default Language</label>
+                                        <select class="form-select" name="default_language">
+                                            <option value="en" {{if eq .Settings.DefaultLanguage "en"}}selected{{end}}>English</option>
+                                            <option value="es" {{if eq .Settings.DefaultLanguage "es"}}selected{{end}}>Spanish</option>
+                                            <option value="fr" {{if eq .Settings.DefaultLanguage "fr"}}selected{{end}}>French</option>
+                                            <option value="de" {{if eq .Settings.DefaultLanguage "de"}}selected{{end}}>German</option>
+                                            <option value="zh" {{if eq .Settings.DefaultLanguage "zh"}}selected{{end}}>Chinese</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Default Currency</label>
+                                        <select class="form-select" name="default_currency">
+                                            <option value="USD" {{if eq .Settings.DefaultCurrency "USD"}}selected{{end}}>USD - US Dollar</option>
+                                            <option value="EUR" {{if eq .Settings.DefaultCurrency "EUR"}}selected{{end}}>EUR - Euro</option>
+                                            <option value="GBP" {{if eq .Settings.DefaultCurrency "GBP"}}selected{{end}}>GBP - British Pound</option>
+                                            <option value="CAD" {{if eq .Settings.DefaultCurrency "CAD"}}selected{{end}}>CAD - Canadian Dollar</option>
+                                            <option value="CNY" {{if eq .Settings.DefaultCurrency "CNY"}}selected{{end}}>CNY - Chinese Yuan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Date Format</label>
+                                        <select class="form-select" name="date_format">
+                                            <option value="Y-m-d" {{if eq .Settings.DateFormat "Y-m-d"}}selected{{end}}>2024-01-15</option>
+                                            <option value="d/m/Y" {{if eq .Settings.DateFormat "d/m/Y"}}selected{{end}}>15/01/2024</option>
+                                            <option value="m/d/Y" {{if eq .Settings.DateFormat "m/d/Y"}}selected{{end}}>01/15/2024</option>
+                                            <option value="d.m.Y" {{if eq .Settings.DateFormat "d.m.Y"}}selected{{end}}>15.01.2024</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Timezone</label>
+                                        <select class="form-select" name="timezone">
+                                            <option value="UTC" {{if eq .Settings.Timezone "UTC"}}selected{{end}}>UTC</option>
+                                            <option value="America/New_York" {{if eq .Settings.Timezone "America/New_York"}}selected{{end}}>Eastern Time</option>
+                                            <option value="America/Los_Angeles" {{if eq .Settings.Timezone "America/Los_Angeles"}}selected{{end}}>Pacific Time</option>
+                                            <option value="Europe/London" {{if eq .Settings.Timezone "Europe/London"}}selected{{end}}>London</option>
+                                            <option value="Europe/Paris" {{if eq .Settings.Timezone "Europe/Paris"}}selected{{end}}>Paris</option>
+                                            <option value="Asia/Shanghai" {{if eq .Settings.Timezone "Asia/Shanghai"}}selected{{end}}>Shanghai</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="enable_multi_currency" id="multiCurrency" {{if .Settings.EnableMultiCurrency}}checked{{end}}>
+                                    <label class="form-check-label" for="multiCurrency">Enable Multi-Currency</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Settings -->
+                <div class="tab-pane fade" id="billing">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Billing Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="billingSettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Invoice Number Format</label>
+                                        <input type="text" class="form-control" name="invoice_format" value="{{.Settings.InvoiceFormat}}" placeholder="INV-{YEAR}-{NUMBER}">
+                                        <div class="form-text">Available: {YEAR}, {MONTH}, {NUMBER}</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Next Invoice Number</label>
+                                        <input type="number" class="form-control" name="next_invoice_number" value="{{.Settings.NextInvoiceNumber}}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Generate Invoice Days Before Due</label>
+                                        <input type="number" class="form-control" name="invoice_days_before" value="{{.Settings.InvoiceDaysBefore}}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Payment Due Days</label>
+                                        <input type="number" class="form-control" name="payment_due_days" value="{{.Settings.PaymentDueDays}}">
+                                    </div>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="auto_suspend" id="autoSuspend" {{if .Settings.AutoSuspend}}checked{{end}}>
+                                    <label class="form-check-label" for="autoSuspend">Auto-Suspend Overdue Services</label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Suspend Days After Due</label>
+                                        <input type="number" class="form-control" name="suspend_days" value="{{.Settings.SuspendDays}}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Terminate Days After Suspend</label>
+                                        <input type="number" class="form-control" name="terminate_days" value="{{.Settings.TerminateDays}}">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Settings -->
+                <div class="tab-pane fade" id="email">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Email Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="emailSettingsForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Email Type</label>
+                                    <select class="form-select" name="email_type" id="emailType">
+                                        <option value="smtp" {{if eq .Settings.EmailType "smtp"}}selected{{end}}>SMTP</option>
+                                        <option value="php" {{if eq .Settings.EmailType "php"}}selected{{end}}>PHP Mail</option>
+                                    </select>
+                                </div>
+                                <div id="smtpSettings">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">SMTP Host</label>
+                                            <input type="text" class="form-control" name="smtp_host" value="{{.Settings.SMTPHost}}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">SMTP Port</label>
+                                            <input type="number" class="form-control" name="smtp_port" value="{{.Settings.SMTPPort}}">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">SMTP Username</label>
+                                            <input type="text" class="form-control" name="smtp_username" value="{{.Settings.SMTPUsername}}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">SMTP Password</label>
+                                            <input type="password" class="form-control" name="smtp_password" placeholder="Enter to change">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Encryption</label>
+                                        <select class="form-select" name="smtp_encryption">
+                                            <option value="none" {{if eq .Settings.SMTPEncryption "none"}}selected{{end}}>None</option>
+                                            <option value="tls" {{if eq .Settings.SMTPEncryption "tls"}}selected{{end}}>TLS</option>
+                                            <option value="ssl" {{if eq .Settings.SMTPEncryption "ssl"}}selected{{end}}>SSL</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">From Email</label>
+                                        <input type="email" class="form-control" name="from_email" value="{{.Settings.FromEmail}}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">From Name</label>
+                                        <input type="text" class="form-control" name="from_name" value="{{.Settings.FromName}}">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" class="btn btn-secondary ms-2" onclick="testEmail()">Send Test Email</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="securitySettingsForm">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="force_ssl" id="forceSSL" {{if .Settings.ForceSSL}}checked{{end}}>
+                                    <label class="form-check-label" for="forceSSL">Force SSL/HTTPS</label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="require_2fa_admin" id="require2FAAdmin" {{if .Settings.Require2FAAdmin}}checked{{end}}>
+                                    <label class="form-check-label" for="require2FAAdmin">Require 2FA for Admin Users</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Session Timeout (minutes)</label>
+                                    <input type="number" class="form-control" name="session_timeout" value="{{.Settings.SessionTimeout}}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Max Login Attempts</label>
+                                    <input type="number" class="form-control" name="max_login_attempts" value="{{.Settings.MaxLoginAttempts}}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">IP Whitelist (Admin Area)</label>
+                                    <textarea class="form-control" name="ip_whitelist" rows="3" placeholder="One IP per line">{{.Settings.IPWhitelist}}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add more tab panes for other settings... -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle all settings forms
+document.querySelectorAll('form[id$="SettingsForm"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Convert checkboxes to boolean
+        this.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            data[cb.name] = cb.checked;
+        });
+        
+        fetch('/api/v1/admin/settings', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                alert('Settings saved successfully');
+            } else {
+                alert(data.error || 'Failed to save settings');
+            }
+        });
+    });
+});
+
+function testEmail() {
+    const email = prompt('Enter email address for test:');
+    if (email) {
+        fetch('/api/v1/admin/email-templates/test', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({to: email, subject: 'Test Email', body_html: '<p>This is a test email.</p>'})
+        }).then(r => r.json()).then(data => {
+            if (data.success || data.message) {
+                alert('Test email sent!');
+            } else {
+                alert(data.error || 'Failed to send test email');
+            }
+        });
+    }
+}
+</script>
+{{end}}

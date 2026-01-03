@@ -2,7 +2,10 @@ package notification
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
 	"crypto/tls"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -511,10 +514,11 @@ func (s *Service) deliverWebhook(webhook *domain.WebhookConfig, eventType string
 	s.db.Model(webhook).Update("failure_count", webhook.FailureCount+1)
 }
 
-// signPayload signs a payload for webhook verification
+// signPayload signs a payload for webhook verification using HMAC-SHA256
 func (s *Service) signPayload(payload []byte, secret string) string {
-	// Implementation would use HMAC-SHA256
-	return fmt.Sprintf("sha256=%x", payload) // Simplified
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(payload)
+	return "sha256=" + hex.EncodeToString(mac.Sum(nil))
 }
 
 // SendNotification sends a notification through the appropriate channel

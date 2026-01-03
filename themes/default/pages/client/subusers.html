@@ -1,0 +1,379 @@
+{{define "title"}}Sub-Users - {{.Config.SiteName}}{{end}}
+
+{{define "content"}}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Sub-Users</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/client">Dashboard</a></li>
+        <li class="breadcrumb-item active">Sub-Users</li>
+    </ol>
+
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Sub-users allow you to grant access to your account with limited permissions. 
+        They can manage services, submit tickets, or view invoices based on the permissions you assign.
+    </div>
+
+    <!-- Invite Button -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inviteModal">
+            <i class="fas fa-user-plus"></i> Invite Sub-User
+        </button>
+    </div>
+
+    <!-- Pending Invites -->
+    {{if .Invites}}
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-envelope me-1"></i>
+            Pending Invitations
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Sent</th>
+                        <th>Expires</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Invites}}
+                    <tr>
+                        <td>{{.Email}}</td>
+                        <td><span class="badge bg-secondary">{{.Role}}</span></td>
+                        <td>{{.CreatedAt.Format "Jan 02, 2006 15:04"}}</td>
+                        <td>{{.ExpiresAt.Format "Jan 02, 2006"}}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="resendInvite('{{.ID}}')" title="Resend">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="cancelInvite('{{.ID}}')" title="Cancel">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{end}}
+
+    <!-- Active Sub-Users -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-users me-1"></i>
+            Active Sub-Users
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .SubUsers}}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar avatar-sm me-2">
+                                    <span class="avatar-initial rounded-circle bg-primary">
+                                        {{slice .FirstName 0 1}}{{slice .LastName 0 1}}
+                                    </span>
+                                </div>
+                                <div>
+                                    {{.FirstName}} {{.LastName}}
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{.Email}}</td>
+                        <td>
+                            {{if eq .Role "admin"}}
+                            <span class="badge bg-danger">Admin</span>
+                            {{else if eq .Role "billing"}}
+                            <span class="badge bg-warning">Billing</span>
+                            {{else if eq .Role "technical"}}
+                            <span class="badge bg-info">Technical</span>
+                            {{else}}
+                            <span class="badge bg-secondary">{{.Role}}</span>
+                            {{end}}
+                        </td>
+                        <td>
+                            {{if .Active}}
+                            <span class="badge bg-success">Active</span>
+                            {{else}}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {{end}}
+                        </td>
+                        <td>
+                            {{if .LastLoginAt}}
+                            {{.LastLoginAt.Format "Jan 02, 2006"}}
+                            {{else}}
+                            <span class="text-muted">Never</span>
+                            {{end}}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="editSubUser('{{.ID}}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="toggleSubUser('{{.ID}}', {{.Active}})" title="{{if .Active}}Disable{{else}}Enable{{end}}">
+                                    <i class="fas fa-{{if .Active}}ban{{else}}check{{end}}"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteSubUser('{{.ID}}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {{else}}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <p class="text-muted mb-3">No sub-users yet.</p>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inviteModal">
+                                <i class="fas fa-user-plus"></i> Invite Your First Sub-User
+                            </button>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal fade" id="inviteModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Invite Sub-User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="inviteForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" name="role" id="roleSelect">
+                                <option value="admin">Admin - Full Access</option>
+                                <option value="billing">Billing - Invoices & Payments</option>
+                                <option value="technical">Technical - Services & Support</option>
+                                <option value="custom">Custom Permissions</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="customPermissions" style="display: none;">
+                        <h6 class="mb-3">Custom Permissions</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="text-muted small">Services</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[services_view]" id="permServicesView">
+                                    <label class="form-check-label" for="permServicesView">View Services</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[services_manage]" id="permServicesManage">
+                                    <label class="form-check-label" for="permServicesManage">Manage Services</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[services_order]" id="permServicesOrder">
+                                    <label class="form-check-label" for="permServicesOrder">Order Services</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-muted small">Billing</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[invoices_view]" id="permInvoicesView">
+                                    <label class="form-check-label" for="permInvoicesView">View Invoices</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[invoices_pay]" id="permInvoicesPay">
+                                    <label class="form-check-label" for="permInvoicesPay">Pay Invoices</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[payment_methods]" id="permPaymentMethods">
+                                    <label class="form-check-label" for="permPaymentMethods">Manage Payment Methods</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-muted small">Support</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[tickets_view]" id="permTicketsView">
+                                    <label class="form-check-label" for="permTicketsView">View Tickets</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[tickets_create]" id="permTicketsCreate">
+                                    <label class="form-check-label" for="permTicketsCreate">Create Tickets</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="permissions[tickets_reply]" id="permTicketsReply">
+                                    <label class="form-check-label" for="permTicketsReply">Reply to Tickets</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Invitation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Sub-User Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Sub-User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" name="id" id="editSubUserId">
+                    <!-- Similar form fields as invite -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="first_name" id="editFirstName" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="last_name" id="editLastName" readonly>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="editEmail" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" name="role" id="editRole">
+                                <option value="admin">Admin - Full Access</option>
+                                <option value="billing">Billing - Invoices & Payments</option>
+                                <option value="technical">Technical - Services & Support</option>
+                                <option value="custom">Custom Permissions</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('roleSelect').addEventListener('change', function() {
+    document.getElementById('customPermissions').style.display = 
+        this.value === 'custom' ? 'block' : 'none';
+});
+
+function resendInvite(inviteId) {
+    fetch('/api/v1/subusers/invites/' + inviteId + '/resend', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            alert('Invitation resent successfully');
+        } else {
+            alert(data.error || 'Failed to resend invitation');
+        }
+    });
+}
+
+function cancelInvite(inviteId) {
+    if (confirm('Cancel this invitation?')) {
+        fetch('/api/v1/subusers/invites/' + inviteId, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.error || 'Failed to cancel invitation');
+        });
+    }
+}
+
+function editSubUser(subUserId) {
+    fetch('/api/v1/subusers/' + subUserId)
+        .then(r => r.json())
+        .then(data => {
+            if (data.sub_user) {
+                const su = data.sub_user;
+                document.getElementById('editSubUserId').value = su.ID;
+                document.getElementById('editFirstName').value = su.FirstName;
+                document.getElementById('editLastName').value = su.LastName;
+                document.getElementById('editEmail').value = su.Email;
+                document.getElementById('editRole').value = su.Role;
+                new bootstrap.Modal(document.getElementById('editModal')).show();
+            }
+        });
+}
+
+function toggleSubUser(subUserId, isActive) {
+    const action = isActive ? 'disable' : 'enable';
+    if (confirm('Are you sure you want to ' + action + ' this sub-user?')) {
+        fetch('/api/v1/subusers/' + subUserId + '/' + action, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.error || 'Failed to ' + action + ' sub-user');
+        });
+    }
+}
+
+function deleteSubUser(subUserId) {
+    if (confirm('Are you sure you want to delete this sub-user? This cannot be undone.')) {
+        fetch('/api/v1/subusers/' + subUserId, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'}
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.error || 'Failed to delete sub-user');
+        });
+    }
+}
+
+document.getElementById('inviteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+    
+    fetch('/api/v1/subusers/invite', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(r => r.json()).then(data => {
+        if (data.success || data.invite) {
+            alert('Invitation sent successfully!');
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to send invitation');
+        }
+    });
+});
+</script>
+{{end}}
