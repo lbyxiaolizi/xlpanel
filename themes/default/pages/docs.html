@@ -1,0 +1,494 @@
+{{ define "content" }}
+<section class="docs-page">
+    <div class="container">
+        <div class="docs-layout">
+            <!-- Sidebar -->
+            <aside class="docs-sidebar">
+                <nav class="docs-nav">
+                    <div class="docs-nav-section">
+                        <h4>Getting Started</h4>
+                        <ul>
+                            <li><a href="#introduction" class="active">Introduction</a></li>
+                            <li><a href="#installation">Installation</a></li>
+                            <li><a href="#quick-start">Quick Start</a></li>
+                            <li><a href="#configuration">Configuration</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="docs-nav-section">
+                        <h4>Core Concepts</h4>
+                        <ul>
+                            <li><a href="#architecture">Architecture</a></li>
+                            <li><a href="#plugins">Plugin System</a></li>
+                            <li><a href="#billing">Billing Engine</a></li>
+                            <li><a href="#provisioning">Provisioning</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="docs-nav-section">
+                        <h4>Administration</h4>
+                        <ul>
+                            <li><a href="#admin-panel">Admin Panel</a></li>
+                            <li><a href="#products">Products & Services</a></li>
+                            <li><a href="#customers">Customer Management</a></li>
+                            <li><a href="#invoices">Invoices & Payments</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="docs-nav-section">
+                        <h4>Integration</h4>
+                        <ul>
+                            <li><a href="#api-overview">API Overview</a></li>
+                            <li><a href="#webhooks">Webhooks</a></li>
+                            <li><a href="#payment-gateways">Payment Gateways</a></li>
+                            <li><a href="#server-modules">Server Modules</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="docs-content">
+                <div class="docs-header">
+                    <h1>Documentation</h1>
+                    <p>Everything you need to know to get started with OpenHost</p>
+                </div>
+                
+                <!-- Introduction Section -->
+                <section id="introduction" class="docs-section">
+                    <h2>Introduction</h2>
+                    <p>
+                        OpenHost is a modern, open-source hosting and billing management system built with Go. 
+                        It's designed to be a powerful alternative to proprietary solutions like WHMCS and Blesta, 
+                        offering enterprise-grade features with the flexibility and transparency of open source.
+                    </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Key Features</h4>
+                        <ul>
+                            <li><strong>High Performance</strong> - Built with Go for blazing fast response times</li>
+                            <li><strong>Secure by Design</strong> - Enterprise-grade security features built-in</li>
+                            <li><strong>Plugin Architecture</strong> - Extend functionality with gRPC plugins</li>
+                            <li><strong>Precise Billing</strong> - Accurate financial calculations using decimal arithmetic</li>
+                            <li><strong>RESTful API</strong> - Complete API with Swagger documentation</li>
+                        </ul>
+                    </div>
+                </section>
+                
+                <!-- Installation Section -->
+                <section id="installation" class="docs-section">
+                    <h2>Installation</h2>
+                    <p>OpenHost can be installed in several ways. Choose the method that works best for your environment.</p>
+                    
+                    <h3>Prerequisites</h3>
+                    <ul>
+                        <li>Go 1.21 or higher</li>
+                        <li>PostgreSQL 14+ or SQLite 3.35+</li>
+                        <li>512MB RAM minimum (2GB+ recommended)</li>
+                    </ul>
+                    
+                    <h3>Using Go Install</h3>
+                    <div class="code-block">
+                        <pre><code>go install github.com/openhost/openhost@latest</code></pre>
+                        <button class="copy-btn" onclick="OpenHost.copyToClipboard('go install github.com/openhost/openhost@latest', this)">Copy</button>
+                    </div>
+                    
+                    <h3>Using Docker</h3>
+                    <div class="code-block">
+                        <pre><code>docker pull openhost/openhost:latest
+docker run -d -p 6421:6421 openhost/openhost:latest</code></pre>
+                        <button class="copy-btn" onclick="OpenHost.copyToClipboard('docker pull openhost/openhost:latest\ndocker run -d -p 6421:6421 openhost/openhost:latest', this)">Copy</button>
+                    </div>
+                    
+                    <h3>Building from Source</h3>
+                    <div class="code-block">
+                        <pre><code>git clone https://github.com/openhost/openhost.git
+cd openhost
+make build
+./bin/openhost serve</code></pre>
+                        <button class="copy-btn" onclick="OpenHost.copyToClipboard('git clone https://github.com/openhost/openhost.git\ncd openhost\nmake build\n./bin/openhost serve', this)">Copy</button>
+                    </div>
+                </section>
+                
+                <!-- Quick Start Section -->
+                <section id="quick-start" class="docs-section">
+                    <h2>Quick Start</h2>
+                    <p>Get OpenHost up and running in just a few minutes.</p>
+                    
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Run the Installer</h4>
+                                <p>Navigate to <code>http://localhost:6421/install</code> to access the web installer.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Configure Database</h4>
+                                <p>Choose between SQLite (default) or PostgreSQL and enter your connection details.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Create Admin Account</h4>
+                                <p>Set up your administrator email and password.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Start Using OpenHost</h4>
+                                <p>Log in to the admin panel and start configuring your products and services.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Configuration Section -->
+                <section id="configuration" class="docs-section">
+                    <h2>Configuration</h2>
+                    <p>OpenHost uses a configuration file for most settings. The default location is <code>config.yaml</code> in the application directory.</p>
+                    
+                    <h3>Example Configuration</h3>
+                    <div class="code-block">
+                        <pre><code>server:
+  host: "0.0.0.0"
+  port: 6421
+  mode: "production"
+
+database:
+  driver: "sqlite"
+  path: "./data/openhost.db"
+
+security:
+  session_secret: "your-secret-key"
+  bcrypt_cost: 12
+
+mail:
+  driver: "smtp"
+  host: "smtp.example.com"
+  port: 587
+  username: "noreply@example.com"
+  password: "your-password"</code></pre>
+                    </div>
+                    
+                    <h3>Environment Variables</h3>
+                    <p>All configuration options can also be set via environment variables with the <code>OPENHOST_</code> prefix:</p>
+                    <div class="code-block">
+                        <pre><code>export OPENHOST_SERVER_PORT=8080
+export OPENHOST_DATABASE_DRIVER=postgres
+export OPENHOST_DATABASE_URL="postgres://user:pass@localhost/openhost"</code></pre>
+                    </div>
+                </section>
+                
+                <!-- Architecture Section -->
+                <section id="architecture" class="docs-section">
+                    <h2>Architecture</h2>
+                    <p>
+                        OpenHost follows Clean Architecture and Domain-Driven Design principles, 
+                        ensuring a maintainable and testable codebase.
+                    </p>
+                    
+                    <div class="architecture-diagram">
+                        <div class="arch-layer">
+                            <span class="layer-name">Presentation Layer</span>
+                            <span class="layer-desc">HTTP Handlers, Templates, API Endpoints</span>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Application Layer</span>
+                            <span class="layer-desc">Use Cases, Services, DTOs</span>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Domain Layer</span>
+                            <span class="layer-desc">Entities, Value Objects, Domain Services</span>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <span class="layer-name">Infrastructure Layer</span>
+                            <span class="layer-desc">Database, External APIs, Plugins</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Navigation -->
+                <div class="docs-nav-footer">
+                    <a href="/api" class="nav-link-prev">
+                        <span>← Previous</span>
+                        <strong>API Reference</strong>
+                    </a>
+                    <a href="/guides" class="nav-link-next">
+                        <span>Next →</span>
+                        <strong>Guides</strong>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>
+
+<style>
+.docs-page {
+    padding: 2rem 0;
+}
+
+.docs-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+}
+
+.docs-sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.docs-nav-section {
+    margin-bottom: 1.5rem;
+}
+
+.docs-nav-section h4 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: 0.75rem;
+}
+
+.docs-nav-section ul {
+    list-style: none;
+}
+
+.docs-nav-section li {
+    margin-bottom: 0.25rem;
+}
+
+.docs-nav-section a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    transition: var(--transition);
+}
+
+.docs-nav-section a:hover,
+.docs-nav-section a.active {
+    background: var(--bg-secondary);
+    color: var(--primary);
+}
+
+.docs-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.docs-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.docs-header p {
+    font-size: 1.125rem;
+    color: var(--text-tertiary);
+    margin-bottom: 0;
+}
+
+.docs-section {
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.docs-section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.docs-section h3 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.highlight-box {
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--primary);
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin: 1.5rem 0;
+}
+
+.highlight-box h4 {
+    margin-bottom: 1rem;
+}
+
+.highlight-box ul {
+    margin-bottom: 0;
+}
+
+.highlight-box li {
+    margin-bottom: 0.5rem;
+}
+
+.code-block {
+    position: relative;
+    background: #1e1e1e;
+    border-radius: var(--radius-md);
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.code-block pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.code-block code {
+    color: #d4d4d4;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.steps {
+    margin: 2rem 0;
+}
+
+.step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h4 {
+    margin-bottom: 0.25rem;
+}
+
+.step-content p {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.architecture-diagram {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    margin: 1.5rem 0;
+}
+
+.arch-layer {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.layer-name {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.layer-desc {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+.arch-arrow {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--text-tertiary);
+    padding: 0.5rem;
+}
+
+.docs-nav-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.nav-link-prev,
+.nav-link-next {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-secondary);
+}
+
+.nav-link-prev:hover,
+.nav-link-next:hover {
+    color: var(--primary);
+}
+
+.nav-link-prev span,
+.nav-link-next span {
+    font-size: 0.875rem;
+}
+
+.nav-link-prev strong,
+.nav-link-next strong {
+    font-size: 1.125rem;
+}
+
+.nav-link-next {
+    text-align: right;
+}
+
+@media (max-width: 1024px) {
+    .docs-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .docs-sidebar {
+        position: static;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+    }
+}
+</style>
+{{ end }}
