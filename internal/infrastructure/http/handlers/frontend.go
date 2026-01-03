@@ -104,3 +104,93 @@ func Products(c *gin.Context) {
 		},
 	})
 }
+
+func Pricing(c *gin.Context) {
+	web.Render(c, "pricing.html", gin.H{
+		"Title":       "价格",
+		"Description": "OpenHost 价格方案",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Login(c *gin.Context) {
+	web.Render(c, "login.html", gin.H{
+		"Title":       "登录",
+		"Description": "登录到 OpenHost",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Register(c *gin.Context) {
+	web.Render(c, "register.html", gin.H{
+		"Title":       "注册",
+		"Description": "注册 OpenHost 账户",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Features(c *gin.Context) {
+	web.Render(c, "features.html", gin.H{
+		"Title":       "功能特性",
+		"Description": "OpenHost 功能特性",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func About(c *gin.Context) {
+	web.Render(c, "about.html", gin.H{
+		"Title":       "关于我们",
+		"Description": "关于 OpenHost",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Contact(c *gin.Context) {
+	web.Render(c, "contact.html", gin.H{
+		"Title":       "联系我们",
+		"Description": "联系 OpenHost",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Docs(c *gin.Context) {
+	web.Render(c, "docs.html", gin.H{
+		"Title":       "文档",
+		"Description": "OpenHost 文档",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Support(c *gin.Context) {
+	web.Render(c, "support.html", gin.H{
+		"Title":       "支持",
+		"Description": "OpenHost 支持中心",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Cart(c *gin.Context) {
+	web.Render(c, "cart.html", gin.H{
+		"Title":       "购物车",
+		"Description": "您的购物车",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func Checkout(c *gin.Context) {
+	web.Render(c, "checkout.html", gin.H{
+		"Title":       "结账",
+		"Description": "完成订单",
+		"Year":        time.Now().Year(),
+	})
+}
+
+func ConfigureProduct(c *gin.Context) {
+	slug := c.Param("slug")
+	web.Render(c, "configure.html", gin.H{
+		"Title":       "配置产品",
+		"Description": "配置您的产品",
+		"Year":        time.Now().Year(),
+		"ProductSlug": slug,
+	})
+}

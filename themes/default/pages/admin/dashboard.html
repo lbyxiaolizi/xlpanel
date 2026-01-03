@@ -1,0 +1,448 @@
+{{ define "content" }}
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <a href="/admin" class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                    <path d="M16 8L22 13L16 18L10 13L16 8Z" fill="white"/>
+                    <path d="M16 14L22 19V24L16 19L10 24V19L16 14Z" fill="white" opacity="0.7"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="logo-text">
+                    <span>OpenHost</span>
+                    <small>Admin</small>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-title">主菜单</span>
+                <ul>
+                    <li>
+                        <a href="/admin" class="{{ if eq .Section "dashboard" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                            <span>仪表盘</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <span class="nav-section-title">客户管理</span>
+                <ul>
+                    <li>
+                        <a href="/admin/customers" class="{{ if eq .Section "customers" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <span>客户</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/orders" class="{{ if eq .Section "orders" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="m1 1 4 4h16l-2.5 7H7.1"/>
+                            </svg>
+                            <span>订单</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/services" class="{{ if eq .Section "services" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                            <span>服务</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <span class="nav-section-title">财务</span>
+                <ul>
+                    <li>
+                        <a href="/admin/invoices" class="{{ if eq .Section "invoices" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                            </svg>
+                            <span>账单</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <span class="nav-section-title">支持</span>
+                <ul>
+                    <li>
+                        <a href="/admin/tickets" class="{{ if eq .Section "tickets" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>工单</span>
+                            <span class="badge" id="ticketBadge"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <span class="nav-section-title">系统</span>
+                <ul>
+                    <li>
+                        <a href="/admin/products" class="{{ if eq .Section "products" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <rect x="7" y="7" width="3" height="9"/>
+                                <rect x="14" y="7" width="3" height="5"/>
+                            </svg>
+                            <span>产品/服务</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/servers" class="{{ if eq .Section "servers" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="8" rx="2"/>
+                                <rect x="2" y="14" width="20" height="8" rx="2"/>
+                                <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                <line x1="6" y1="18" x2="6.01" y2="18"/>
+                            </svg>
+                            <span>服务器</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/settings" class="{{ if eq .Section "settings" }}active{{ end }}">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                            <span>设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="/" class="sidebar-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                </svg>
+                <span>返回前台</span>
+            </a>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <h1>管理后台</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-search">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" placeholder="搜索...">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        <span class="notification-dot"></span>
+                    </button>
+                </div>
+                <div class="user-dropdown">
+                    <button class="user-dropdown-toggle">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="admin-content">
+            <!-- Stats Overview -->
+            <div class="stats-row">
+                <div class="stat-card revenue">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">本月收入</span>
+                        <span class="stat-value">¥0.00</span>
+                        <span class="stat-change positive">+0%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card orders">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="m1 1 4 4h16l-2.5 7H7.1"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">待处理订单</span>
+                        <span class="stat-value" id="pendingOrders">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card customers">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">总客户数</span>
+                        <span class="stat-value" id="totalCustomers">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card services">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">活跃服务</span>
+                        <span class="stat-value" id="activeServices">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card tickets">
+                    <div class="stat-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">开放工单</span>
+                        <span class="stat-value" id="openTickets">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <h2>收入趋势</h2>
+                        <select class="chart-period">
+                            <option value="7">最近7天</option>
+                            <option value="30" selected>最近30天</option>
+                            <option value="90">最近90天</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                            <p>暂无数据</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card small">
+                    <div class="card-header">
+                        <h2>服务分布</h2>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+                            </svg>
+                            <p>暂无数据</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="activity-row">
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h2>最近订单</h2>
+                        <a href="/admin/orders" class="card-link">查看全部</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <p>暂无订单</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="activity-card">
+                    <div class="card-header">
+                        <h2>待处理工单</h2>
+                        <a href="/admin/tickets" class="card-link">查看全部</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <p>暂无工单</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+/* Admin Layout */
+.admin-layout { display: flex; min-height: 100vh; background: #f1f5f9; }
+.admin-sidebar { width: 260px; background: #1e293b; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+.sidebar-header { padding: 1.25rem; border-bottom: 1px solid #334155; }
+.sidebar-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: white; }
+.logo-text { display: flex; flex-direction: column; }
+.logo-text span { font-weight: 600; font-size: 1.125rem; }
+.logo-text small { font-size: 0.75rem; color: #94a3b8; }
+.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+.nav-section { margin-bottom: 1.5rem; }
+.nav-section-title { display: block; padding: 0 1.25rem; margin-bottom: 0.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; color: #94a3b8; text-decoration: none; transition: all 0.2s; position: relative; }
+.sidebar-nav a:hover { color: white; background: #334155; }
+.sidebar-nav a.active { color: white; background: linear-gradient(90deg, #667eea 0%, #667eea00 100%); }
+.sidebar-nav a.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #667eea; }
+.badge { padding: 0.125rem 0.5rem; background: #ef4444; color: white; font-size: 0.75rem; border-radius: 9999px; margin-left: auto; }
+.sidebar-footer { padding: 1rem; border-top: 1px solid #334155; }
+.sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #94a3b8; text-decoration: none; border-radius: 0.5rem; transition: all 0.2s; }
+.sidebar-link:hover { color: white; background: #334155; }
+
+/* Main Content */
+.admin-main { flex: 1; margin-left: 260px; min-height: 100vh; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-left h1 { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin: 0; }
+.sidebar-toggle { display: none; background: none; border: none; padding: 0.5rem; cursor: pointer; color: #64748b; }
+.header-right { display: flex; align-items: center; gap: 1rem; }
+.header-search { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #f1f5f9; border-radius: 0.5rem; }
+.header-search input { border: none; background: none; outline: none; width: 200px; }
+.header-search svg { color: #94a3b8; }
+.icon-btn { position: relative; padding: 0.5rem; background: none; border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; color: #64748b; }
+.notification-dot { position: absolute; top: 0.25rem; right: 0.25rem; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; }
+.user-dropdown-toggle { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: none; border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; }
+.user-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem; }
+.admin-content { padding: 2rem; }
+
+/* Stats Row */
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.stat-card { background: white; border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.stat-icon { width: 48px; height: 48px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; }
+.stat-card.revenue .stat-icon { background: #dcfce7; color: #16a34a; }
+.stat-card.orders .stat-icon { background: #fef3c7; color: #d97706; }
+.stat-card.customers .stat-icon { background: #dbeafe; color: #2563eb; }
+.stat-card.services .stat-icon { background: #f3e8ff; color: #9333ea; }
+.stat-card.tickets .stat-icon { background: #fee2e2; color: #dc2626; }
+.stat-label { font-size: 0.875rem; color: #64748b; display: block; }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; display: block; }
+.stat-change { font-size: 0.75rem; font-weight: 500; }
+.stat-change.positive { color: #16a34a; }
+.stat-change.negative { color: #dc2626; }
+
+/* Charts Row */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.chart-card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); overflow: hidden; }
+.card-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; }
+.card-header h2 { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0; }
+.card-link { font-size: 0.875rem; color: #667eea; text-decoration: none; }
+.chart-period { padding: 0.25rem 0.5rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.875rem; }
+.chart-container { padding: 1.5rem; min-height: 250px; }
+.chart-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: #94a3b8; }
+
+/* Activity Row */
+.activity-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.activity-card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.card-body { padding: 1.5rem; min-height: 200px; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 150px; color: #94a3b8; }
+
+/* Responsive */
+@media (max-width: 1280px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 1024px) { .stats-row { grid-template-columns: repeat(2, 1fr); } .charts-row { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+    .admin-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .admin-sidebar.open { transform: translateX(0); }
+    .admin-main { margin-left: 0; }
+    .sidebar-toggle { display: block; }
+    .admin-content { padding: 1rem; }
+    .stats-row { grid-template-columns: 1fr; }
+    .activity-row { grid-template-columns: 1fr; }
+    .header-search { display: none; }
+}
+</style>
+
+<script>
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    document.querySelector('.admin-sidebar').classList.toggle('open');
+});
+
+async function loadDashboardStats() {
+    try {
+        const ticketsRes = await fetch('/api/v1/admin/tickets/stats');
+        if (ticketsRes.ok) {
+            const data = await ticketsRes.json();
+            const openTicketsEl = document.getElementById('openTickets');
+            if (openTicketsEl) {
+                openTicketsEl.textContent = data.open || 0;
+            }
+            const badge = document.getElementById('ticketBadge');
+            if (badge && data.open > 0) {
+                badge.textContent = data.open;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboardStats);
+</script>
+{{ end }}

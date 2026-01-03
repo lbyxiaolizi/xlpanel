@@ -1,0 +1,295 @@
+{{ define "content" }}
+<div class="client-layout">
+    <!-- Sidebar (same as dashboard) -->
+    <aside class="client-sidebar">
+        <div class="sidebar-header">
+            <a href="/client" class="sidebar-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                    <path d="M16 8L22 13L16 18L10 13L16 8Z" fill="white"/>
+                    <path d="M16 14L22 19V24L16 19L10 24V19L16 14Z" fill="white" opacity="0.7"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>OpenHost</span>
+            </a>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="/client"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>控制面板</span></a></li>
+                <li><a href="/client/services" class="active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>我的服务</span></a></li>
+                <li><a href="/client/invoices"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>账单</span></a></li>
+                <li><a href="/client/tickets"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>工单支持</span></a></li>
+                <li><a href="/client/profile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>个人资料</span></a></li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="/products" class="sidebar-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="m1 1 4 4h16l-2.5 7H7.1"/></svg><span>选购产品</span></a>
+            <a href="/logout" class="sidebar-link logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>退出登录</span></a>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="client-main">
+        <header class="client-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <h1>我的服务</h1>
+            </div>
+            <div class="header-actions">
+                <a href="/products" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    订购新服务
+                </a>
+            </div>
+        </header>
+        
+        <div class="client-content">
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">所有状态</option>
+                        <option value="active">活跃</option>
+                        <option value="suspended">已暂停</option>
+                        <option value="pending">待处理</option>
+                        <option value="terminated">已终止</option>
+                    </select>
+                </div>
+                <div class="search-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="搜索服务...">
+                </div>
+            </div>
+            
+            <!-- Services List -->
+            <div class="services-container">
+                <div id="servicesList" class="services-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div id="pagination" class="pagination"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.client-layout { display: flex; min-height: 100vh; background: #f8fafc; }
+.client-sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+.sidebar-header { padding: 1.25rem; border-bottom: 1px solid #e2e8f0; }
+.sidebar-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #1e293b; font-weight: 600; font-size: 1.25rem; }
+.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; color: #64748b; text-decoration: none; transition: all 0.2s; }
+.sidebar-nav a:hover { color: #667eea; background: #f1f5f9; }
+.sidebar-nav a.active { color: #667eea; background: linear-gradient(90deg, #667eea10 0%, transparent 100%); border-left: 3px solid #667eea; }
+.sidebar-footer { padding: 1rem; border-top: 1px solid #e2e8f0; }
+.sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: #64748b; text-decoration: none; border-radius: 0.5rem; transition: all 0.2s; }
+.sidebar-link:hover { color: #667eea; background: #f1f5f9; }
+.sidebar-link.logout:hover { color: #ef4444; background: #fef2f2; }
+.client-main { flex: 1; margin-left: 260px; min-height: 100vh; }
+.client-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
+.header-left { display: flex; align-items: center; gap: 1rem; }
+.header-left h1 { font-size: 1.25rem; font-weight: 600; color: #1e293b; margin: 0; }
+.sidebar-toggle { display: none; background: none; border: none; padding: 0.5rem; cursor: pointer; color: #64748b; }
+.client-content { padding: 2rem; }
+
+/* Filters */
+.filters-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+.filter-group { display: flex; gap: 0.5rem; }
+.form-select { padding: 0.5rem 2rem 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; font-size: 0.875rem; color: #1e293b; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+.search-box { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; }
+.search-box input { border: none; outline: none; font-size: 0.875rem; width: 200px; }
+.search-box svg { color: #94a3b8; }
+
+/* Services Grid */
+.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+.service-card { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.2s; }
+.service-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+.service-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.service-name { font-weight: 600; color: #1e293b; font-size: 1rem; margin: 0 0 0.25rem 0; }
+.service-hostname { font-size: 0.875rem; color: #64748b; }
+.service-status { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+.status-active { background: #dcfce7; color: #16a34a; }
+.status-suspended { background: #fef3c7; color: #d97706; }
+.status-pending { background: #dbeafe; color: #2563eb; }
+.status-terminated { background: #fee2e2; color: #dc2626; }
+.service-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+.detail-item { display: flex; flex-direction: column; }
+.detail-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.detail-value { font-size: 0.875rem; color: #1e293b; font-weight: 500; }
+.service-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.875rem; }
+
+/* Loading & Empty State */
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: #94a3b8; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 4rem 2rem; color: #94a3b8; }
+.empty-state svg { margin-bottom: 1rem; }
+
+/* Pagination */
+.pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
+.pagination button { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; background: white; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; }
+.pagination button:hover { border-color: #667eea; color: #667eea; }
+.pagination button.active { background: #667eea; color: white; border-color: #667eea; }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+    .client-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .client-sidebar.open { transform: translateX(0); }
+    .client-main { margin-left: 0; }
+    .sidebar-toggle { display: block; }
+    .client-content { padding: 1rem; }
+    .filters-bar { flex-direction: column; align-items: stretch; }
+    .search-box input { width: 100%; }
+}
+</style>
+
+<script>
+let currentPage = 1;
+let totalPages = 1;
+
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    document.querySelector('.client-sidebar').classList.toggle('open');
+});
+
+document.getElementById('statusFilter')?.addEventListener('change', () => { currentPage = 1; loadServices(); });
+document.getElementById('searchInput')?.addEventListener('input', debounce(() => { currentPage = 1; loadServices(); }, 300));
+
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+async function loadServices() {
+    const container = document.getElementById('servicesList');
+    const status = document.getElementById('statusFilter').value;
+    const search = document.getElementById('searchInput').value;
+    
+    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
+    
+    try {
+        let url = `/api/v1/services?page=${currentPage}&limit=12`;
+        if (status) url += `&status=${status}`;
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to load services');
+        
+        const data = await res.json();
+        totalPages = data.total_pages || 1;
+        renderServices(data.data || []);
+        renderPagination();
+    } catch (error) {
+        container.innerHTML = '<div class="empty-state"><p>加载服务失败，请重试</p></div>';
+    }
+}
+
+function renderServices(services) {
+    const container = document.getElementById('servicesList');
+    
+    if (!services.length) {
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                <h3>暂无服务</h3>
+                <p>您还没有任何服务，立即选购开始使用</p>
+                <a href="/products" class="btn btn-primary" style="margin-top: 1rem;">选购产品</a>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = services.map(service => `
+        <div class="service-card">
+            <div class="service-header">
+                <div>
+                    <h3 class="service-name">${service.product_name}</h3>
+                    <p class="service-hostname">${service.hostname || service.domain || '-'}</p>
+                </div>
+                <span class="service-status status-${service.status}">${getStatusText(service.status)}</span>
+            </div>
+            <div class="service-details">
+                <div class="detail-item">
+                    <span class="detail-label">计费周期</span>
+                    <span class="detail-value">${getBillingCycleText(service.billing_cycle)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">金额</span>
+                    <span class="detail-value">${service.currency || '¥'}${service.recurring_amount}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">到期日期</span>
+                    <span class="detail-value">${service.next_due_date}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">IP地址</span>
+                    <span class="detail-value">${service.ip_address || '-'}</span>
+                </div>
+            </div>
+            <div class="service-actions">
+                <a href="/client/services/${service.id}" class="btn btn-outline btn-sm">管理服务</a>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getStatusText(status) {
+    const map = { active: '活跃', suspended: '已暂停', pending: '待处理', terminated: '已终止' };
+    return map[status] || status;
+}
+
+function getBillingCycleText(cycle) {
+    const map = { monthly: '每月', quarterly: '每季度', annually: '每年', yearly: '每年' };
+    return map[cycle] || cycle;
+}
+
+function renderPagination() {
+    const container = document.getElementById('pagination');
+    if (totalPages <= 1) { container.innerHTML = ''; return; }
+    
+    let html = `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            html += `<button onclick="goToPage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            html += '<span>...</span>';
+        }
+    }
+    html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
+    container.innerHTML = html;
+}
+
+function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    loadServices();
+}
+
+document.addEventListener('DOMContentLoaded', loadServices);
+</script>
+{{ end }}

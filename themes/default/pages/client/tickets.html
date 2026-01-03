@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Tickets - Client Area</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/client">OpenHost</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/client">Dashboard</a>
+                <a class="nav-link" href="/client/services">Services</a>
+                <a class="nav-link" href="/client/invoices">Invoices</a>
+                <a class="nav-link active" href="/client/tickets">Support</a>
+                <a class="nav-link" href="/client/profile">Profile</a>
+                <a class="nav-link" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-headset me-2"></i>Support Tickets</h2>
+            <a href="/client/tickets/new" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>New Ticket
+            </a>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <a href="/knowledgebase" class="card border-0 bg-light text-decoration-none h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-book display-4 text-primary mb-3"></i>
+                        <h5>Knowledge Base</h5>
+                        <p class="text-muted mb-0">Find answers to common questions</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/announcements" class="card border-0 bg-light text-decoration-none h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-megaphone display-4 text-info mb-3"></i>
+                        <h5>Announcements</h5>
+                        <p class="text-muted mb-0">Latest news and updates</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/network-status" class="card border-0 bg-light text-decoration-none h-100">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-activity display-4 text-success mb-3"></i>
+                        <h5>Network Status</h5>
+                        <p class="text-muted mb-0">Check service status</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-filter="open">Open</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-filter="on_hold">On Hold</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-filter="closed">Closed</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-filter="all">All</a>
+                    </li>
+                </ul>
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search tickets..." id="searchTickets">
+                    <button class="btn btn-outline-secondary btn-sm" type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Subject</th>
+                                <th>Department</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Last Update</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketsList">
+                            <!-- Tickets will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center text-muted">
+            <p>&copy; {{.Year}} OpenHost. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTickets('open');
+            
+            document.querySelectorAll('[data-filter]').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('[data-filter]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    loadTickets(this.dataset.filter);
+                });
+            });
+        });
+
+        async function loadTickets(status = 'open') {
+            try {
+                const response = await fetch(`/api/v1/tickets?status=${status}`);
+                const data = await response.json();
+                
+                const tbody = document.getElementById('ticketsList');
+                if (!data.tickets || data.tickets.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                                No tickets found
+                                <br>
+                                <a href="/client/tickets/new" class="btn btn-primary btn-sm mt-3">Create New Ticket</a>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.tickets.map(ticket => `
+                    <tr onclick="window.location='/client/tickets/${ticket.id}'" style="cursor:pointer">
+                        <td><strong>#${ticket.id}</strong></td>
+                        <td>
+                            ${ticket.subject}
+                            ${ticket.unread_replies > 0 ? `<span class="badge bg-primary ms-2">${ticket.unread_replies} new</span>` : ''}
+                        </td>
+                        <td>${ticket.department || 'General'}</td>
+                        <td>${getPriorityBadge(ticket.priority)}</td>
+                        <td>${getStatusBadge(ticket.status)}</td>
+                        <td><small class="text-muted">${timeAgo(ticket.updated_at)}</small></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+            }
+        }
+
+        function getPriorityBadge(priority) {
+            const badges = {
+                'low': '<span class="badge bg-secondary">Low</span>',
+                'normal': '<span class="badge bg-info">Normal</span>',
+                'high': '<span class="badge bg-warning text-dark">High</span>',
+                'urgent': '<span class="badge bg-danger">Urgent</span>'
+            };
+            return badges[priority] || badges['normal'];
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'open': '<span class="badge bg-success">Open</span>',
+                'on_hold': '<span class="badge bg-warning text-dark">On Hold</span>',
+                'closed': '<span class="badge bg-secondary">Closed</span>',
+                'answered': '<span class="badge bg-info">Answered</span>',
+                'customer_reply': '<span class="badge bg-primary">Customer Reply</span>'
+            };
+            return badges[status] || `<span class="badge bg-secondary">${status}</span>`;
+        }
+
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+            return date.toLocaleDateString();
+        }
+    </script>
+</body>
+</html>
