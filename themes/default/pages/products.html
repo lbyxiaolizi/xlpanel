@@ -1,0 +1,402 @@
+{{ define "content" }}
+<section class="products-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Our Products</h1>
+            <p>Choose the perfect hosting solution for your needs</p>
+        </div>
+
+        <!-- Product Categories -->
+        <div class="product-categories">
+            <button class="category-btn active" data-category="all">All Products</button>
+            <button class="category-btn" data-category="vps">VPS Hosting</button>
+            <button class="category-btn" data-category="dedicated">Dedicated Servers</button>
+            <button class="category-btn" data-category="web">Web Hosting</button>
+            <button class="category-btn" data-category="domain">Domains</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-3 products-grid">
+            {{ range .Products }}
+            <div class="card product-card" data-category="{{ .Category }}">
+                {{ if .IsPopular }}<div class="product-badge">Popular</div>{{ end }}
+                <div class="product-header">
+                    <h3 class="product-name">{{ .Name }}</h3>
+                    <p class="product-description">{{ .Description }}</p>
+                </div>
+                
+                <div class="product-pricing">
+                    <div class="product-price">
+                        <span class="currency">{{ .Currency }}</span>
+                        <span class="amount">{{ .Price }}</span>
+                        <span class="period">/{{ .BillingCycle }}</span>
+                    </div>
+                </div>
+                
+                <div class="product-features">
+                    <ul class="feature-list">
+                        {{ range .Features }}
+                        <li>
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ . }}
+                        </li>
+                        {{ end }}
+                    </ul>
+                </div>
+                
+                <div class="product-footer">
+                    <a href="/order/{{ .ID }}" class="btn btn-primary btn-block">Order Now</a>
+                    <a href="/products/{{ .Slug }}" class="btn btn-outline btn-block">Learn More</a>
+                </div>
+            </div>
+            {{ end }}
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison-section">
+            <h2 class="text-center mb-4">Compare Plans</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Basic</th>
+                            <th>Pro</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CPU Cores</td>
+                            <td>1 Core</td>
+                            <td>2 Cores</td>
+                            <td>4 Cores</td>
+                        </tr>
+                        <tr>
+                            <td>RAM</td>
+                            <td>1 GB</td>
+                            <td>4 GB</td>
+                            <td>8 GB</td>
+                        </tr>
+                        <tr>
+                            <td>Storage</td>
+                            <td>25 GB SSD</td>
+                            <td>50 GB SSD</td>
+                            <td>100 GB SSD</td>
+                        </tr>
+                        <tr>
+                            <td>Bandwidth</td>
+                            <td>1 TB</td>
+                            <td>2 TB</td>
+                            <td>5 TB</td>
+                        </tr>
+                        <tr>
+                            <td>Support</td>
+                            <td>Email</td>
+                            <td>Email + Chat</td>
+                            <td>24/7 Priority</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>What payment methods do you accept?</h4>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We accept all major credit cards, PayPal, and bank transfers. Cryptocurrency payments are also available for annual plans.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Can I upgrade my plan later?</h4>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! You can upgrade your plan at any time. The price difference will be prorated for the remaining billing period.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h4>Is there a setup fee?</h4>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No, all our plans are setup fee-free. You only pay the monthly/annual subscription cost.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.products-page {
+    padding: 3rem 0;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.page-header p {
+    font-size: 1.25rem;
+    color: var(--text-tertiary);
+}
+
+.product-categories {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.product-header {
+    margin-bottom: 1.5rem;
+}
+
+.product-name {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-description {
+    color: var(--text-tertiary);
+    font-size: 0.875rem;
+}
+
+.product-pricing {
+    text-align: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.product-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.product-price .currency {
+    font-size: 1rem;
+    color: var(--text-tertiary);
+}
+
+.product-price .amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.product-price .period {
+    font-size: 1rem;
+    color: var(--text-tertiary);
+}
+
+.feature-list {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+.feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.feature-list svg {
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+.product-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.comparison-section {
+    margin-top: 4rem;
+    padding: 3rem 0;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl);
+}
+
+.comparison-table-wrapper {
+    overflow-x: auto;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+
+.comparison-table th {
+    background: var(--bg-tertiary);
+    font-weight: 600;
+}
+
+.comparison-table tbody tr:hover {
+    background: var(--bg-primary);
+}
+
+.faq-section {
+    margin-top: 4rem;
+}
+
+.faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    cursor: pointer;
+    background: var(--bg-primary);
+    transition: var(--transition);
+}
+
+.faq-question:hover {
+    background: var(--bg-secondary);
+}
+
+.faq-question h4 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.faq-toggle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    transition: var(--transition);
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    display: none;
+    padding: 0 1.5rem 1.5rem;
+    color: var(--text-secondary);
+}
+
+.faq-item.active .faq-answer {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+
+<script>
+// FAQ Toggle
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const item = question.parentElement;
+        item.classList.toggle('active');
+    });
+});
+
+// Category Filter
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const category = btn.dataset.category;
+        document.querySelectorAll('.product-card').forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{{ end }}
