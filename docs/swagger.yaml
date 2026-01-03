@@ -1,0 +1,27 @@
+basePath: /api/v1
+definitions:
+  handlers.HealthResponse:
+    properties:
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: OpenHost API for provisioning and billing.
+  title: OpenHost API
+  version: "0.1"
+paths:
+  /health:
+    get:
+      description: Returns API liveness status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.HealthResponse'
+      summary: Health check
+      tags:
+      - system
+swagger: "2.0"
