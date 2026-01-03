@@ -27,6 +27,7 @@ type Server struct {
 	subService      *service.SubscriptionService
 	paymentsService *service.PaymentsService
 	autoService     *service.AutomationService
+	indexTemplate   *template.Template
 }
 
 func NewServer(
@@ -43,7 +44,7 @@ func NewServer(
 	paymentsService *service.PaymentsService,
 	autoService *service.AutomationService,
 ) *Server {
-	return &Server{
+	s := &Server{
 		config:          config,
 		metrics:         metrics,
 		tenants:         tenants,
@@ -57,6 +58,35 @@ func NewServer(
 		paymentsService: paymentsService,
 		autoService:     autoService,
 	}
+
+	// Parse and cache templates at startup
+	if err := s.loadTemplates(); err != nil {
+		log.Printf("Warning: failed to load templates: %v", err)
+	}
+
+	return s
+}
+
+func (s *Server) loadTemplates() error {
+	// Validate theme name to prevent path traversal
+	theme := filepath.Base(s.config.DefaultTheme)
+	if theme != s.config.DefaultTheme {
+		return filepath.ErrBadPattern
+	}
+
+	// Build theme path
+	themePath := filepath.Join("frontend", "themes", theme)
+	basePath := filepath.Join(themePath, "base.html")
+	homePath := filepath.Join(themePath, "home.html")
+
+	// Parse templates
+	tmpl, err := template.ParseFiles(basePath, homePath)
+	if err != nil {
+		return err
+	}
+
+	s.indexTemplate = tmpl
+	return nil
 }
 
 func (s *Server) Routes() http.Handler {
@@ -189,15 +219,9 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Build theme path
-	themePath := filepath.Join("frontend", "themes", s.config.DefaultTheme)
-	basePath := filepath.Join(themePath, "base.html")
-	homePath := filepath.Join(themePath, "home.html")
-
-	// Parse templates
-	tmpl, err := template.ParseFiles(basePath, homePath)
-	if err != nil {
-		log.Printf("Error parsing templates: %v", err)
+	// Check if templates are loaded
+	if s.indexTemplate == nil {
+		log.Printf("Templates not loaded")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -208,7 +232,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Execute template
-	if err := tmpl.ExecuteTemplate(w, "base.html", data); err != nil {
+	if err := s.indexTemplate.ExecuteTemplate(w, "base.html", data); err != nil {
 		log.Printf("Error executing template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
