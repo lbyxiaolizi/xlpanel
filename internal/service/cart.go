@@ -32,7 +32,8 @@ func (s *CartService) GetOrCreateCart(customerID, tenantID string) *domain.Cart 
 	// Try to find existing cart
 	for _, cart := range s.carts.List() {
 		if cart.CustomerID == customerID && cart.TenantID == tenantID {
-			return &cart
+			cartCopy := cart // Create a copy to avoid pointer issues
+			return &cartCopy
 		}
 	}
 

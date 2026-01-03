@@ -73,7 +73,8 @@ func (s *AuthService) Login(tenantID, email, password string) (string, *domain.U
 	var foundUser *domain.User
 	for _, u := range s.users.List() {
 		if u.Email == email && u.TenantID == tenantID {
-			foundUser = &u
+			userCopy := u // Create a copy to avoid pointer issues
+			foundUser = &userCopy
 			break
 		}
 	}
@@ -213,7 +214,8 @@ func (s *AuthService) generateJWT(user *domain.User) (string, error) {
 func (s *AuthService) GetUserByEmail(tenantID, email string) (*domain.User, error) {
 	for _, u := range s.users.List() {
 		if u.Email == email && u.TenantID == tenantID {
-			return &u, nil
+			userCopy := u // Create a copy to avoid pointer issues
+			return &userCopy, nil
 		}
 	}
 	return nil, ErrUserNotFound

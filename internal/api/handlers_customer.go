@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -373,7 +374,7 @@ func (s *Server) handleCartCheckout(w http.ResponseWriter, r *http.Request) {
 		lang,
 	); err != nil {
 		// Log but don't fail the request
-		fmt.Printf("Failed to send invoice email: %v\n", err)
+		log.Printf("Failed to send invoice email: %v\n", err)
 	}
 
 	// Clear the cart
