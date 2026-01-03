@@ -10,7 +10,7 @@ OpenHost provides a RESTful API for managing hosting services, billing, and cust
 
 ```
 Production: https://api.yourdomain.com/api/v1
-Development: http://localhost:8080/api/v1
+Development: http://localhost:6421/api/v1
 ```
 
 ## Authentication

@@ -62,11 +62,11 @@ Start the main server:
 ./bin/server
 ```
 
-The server will start at `http://localhost:8080`.
+The server will start at `http://localhost:6421`.
 
 API health check:
 ```bash
-curl http://localhost:8080/api/v1/health
+curl http://localhost:6421/api/v1/health
 ```
 
 ## 🔌 Plugin System

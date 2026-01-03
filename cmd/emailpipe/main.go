@@ -100,13 +100,10 @@ func processEmail(reader io.Reader, repo *tickets.Repository) error {
 	}
 
 	for _, attachment := range envelope.Attachments {
-		data, err := attachment.Content()
-		if err != nil {
-			return fmt.Errorf("read attachment: %w", err)
-		}
+		data := attachment.Content
 		message.Attachments = append(message.Attachments, domain.TicketAttachment{
-			FileName:    attachment.FileName(),
-			ContentType: attachment.ContentType(),
+			FileName:    attachment.FileName,
+			ContentType: attachment.ContentType,
 			SizeBytes:   int64(len(data)),
 			Data:        data,
 		})
