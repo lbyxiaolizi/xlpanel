@@ -111,7 +111,7 @@
                         <div class="invoice-item">
                             <div class="invoice-info">
                                 <div class="invoice-number">{{ .InvoiceNumber }}</div>
-                                <div class="invoice-date">{{ .CreatedAt }}</div>
+                                <div class="invoice-date">{{ .CreatedAt.Format "Jan 2, 2006" }}</div>
                             </div>
                             <div class="invoice-amount">
                                 <div class="amount">{{ .Currency }}{{ .Total }}</div>
@@ -158,7 +158,7 @@
                                 <td>
                                     <span class="priority-badge priority-{{ .Priority }}">{{ .Priority }}</span>
                                 </td>
-                                <td>{{ .UpdatedAt }}</td>
+                                <td>{{ .UpdatedAt.Format "Jan 2, 2006 15:04" }}</td>
                                 <td>
                                     <a href="/tickets/{{ .ID }}" class="btn btn-sm btn-outline">View</a>
                                 </td>

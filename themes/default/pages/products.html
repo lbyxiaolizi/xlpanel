@@ -20,7 +20,7 @@
         <div class="grid grid-3 products-grid">
             {{ range .Products }}
             <div class="card product-card" data-category="{{ .Category }}">
-                <div class="product-badge">Popular</div>
+                {{ if .IsPopular }}<div class="product-badge">Popular</div>{{ end }}
                 <div class="product-header">
                     <h3 class="product-name">{{ .Name }}</h3>
                     <p class="product-description">{{ .Description }}</p>

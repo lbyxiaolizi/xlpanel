@@ -145,13 +145,31 @@ Features:
 
 ## JavaScript Features
 
-- Mobile navigation toggle
-- Auto-dismissing alerts
-- Form validation helper
-- Price calculator
-- Copy to clipboard
-- Toast notifications
-- Smooth scrolling
+All utilities are available under the `OpenHost` namespace to avoid conflicts:
+
+- **Mobile navigation** - Automatic toggle and close on outside click
+- **Auto-dismissing alerts** - Alerts fade out after 5 seconds
+- **Form validation** - `OpenHost.validateForm(formId)`
+- **Price calculator** - `OpenHost.calculatePrice(basePrice, cycle, quantity)`
+- **Copy to clipboard** - `OpenHost.copyToClipboard(text, button)`
+- **Loading states** - `OpenHost.setLoading(button, isLoading)`
+- **Toast notifications** - `OpenHost.showToast(message, type)`
+- **Smooth scrolling** - Automatic for anchor links
+
+Example usage:
+```javascript
+// Validate a form
+if (OpenHost.validateForm('checkout-form')) {
+    // Form is valid
+}
+
+// Show a notification
+OpenHost.showToast('Order placed successfully!', 'success');
+
+// Calculate pricing
+const pricing = OpenHost.calculatePrice(9.99, 'annually', 2);
+console.log(pricing.total); // 179.82
+```
 
 ## Browser Support
 

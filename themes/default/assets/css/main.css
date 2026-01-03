@@ -258,7 +258,7 @@ p {
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    color: var(--bg-primary);
     border-color: transparent;
 }
 
@@ -275,7 +275,7 @@ p {
 
 .btn-outline:hover {
     background: var(--primary);
-    color: white;
+    color: var(--bg-primary);
 }
 
 .btn-secondary {
@@ -484,7 +484,7 @@ textarea.form-control {
 
 .social-link:hover {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    color: var(--bg-primary);
     transform: translateY(-2px);
 }
 
