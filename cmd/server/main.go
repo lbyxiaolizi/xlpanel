@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"xlpanel/internal/api"
 	"xlpanel/internal/core"
@@ -14,6 +18,7 @@ import (
 )
 
 func main() {
+	config := core.LoadConfigFromEnv()
 	metrics := infra.NewMetricsRegistry()
 
 	tenantRepo := infra.NewRepository(func(t domain.Tenant) string { return t.ID })
@@ -43,7 +48,7 @@ func main() {
 	automationService := service.NewAutomationService(metrics)
 
 	server := api.NewServer(
-		core.DefaultConfig,
+		config,
 		metrics,
 		tenantRepo,
 		customerRepo,
@@ -57,8 +62,33 @@ func main() {
 		automationService,
 	)
 
-	log.Println("XLPanel running on :8080")
-	if err := http.ListenAndServe(":8080", server.Routes()); err != nil {
-		log.Fatalf("server error: %v", err)
+	httpServer := &http.Server{
+		Addr:              config.Address,
+		Handler:           server.Routes(),
+		ReadTimeout:       config.ReadTimeout,
+		ReadHeaderTimeout: config.ReadHeaderTimeout,
+		WriteTimeout:      config.WriteTimeout,
+		IdleTimeout:       config.IdleTimeout,
+	}
+
+	shutdownCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	go func() {
+		log.Printf("XLPanel running on %s", config.Address)
+		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	<-shutdownCtx.Done()
+	log.Println("shutdown signal received")
+
+	ctx, cancel := context.WithTimeout(context.Background(), config.ShutdownTimeout)
+	defer cancel()
+
+	if err := httpServer.Shutdown(ctx); err != nil {
+		log.Printf("graceful shutdown failed: %v", err)
+		_ = httpServer.Close()
 	}
 }
