@@ -31,6 +31,9 @@ func main() {
 	vpsRepo := infra.NewRepository(func(v domain.VPSInstance) string { return v.ID })
 	ipRepo := infra.NewRepository(func(ip domain.IPAllocation) string { return ip.ID })
 	ticketRepo := infra.NewRepository(func(t domain.Ticket) string { return t.ID })
+	userRepo := infra.NewRepository(func(u domain.User) string { return u.ID })
+	sessionRepo := infra.NewRepository(func(s domain.Session) string { return s.ID })
+	cartRepo := infra.NewRepository(func(c domain.Cart) string { return c.ID })
 
 	registry := plugins.NewRegistry()
 	registry.Register(providers.NewAlipayFaceToFace())
@@ -46,6 +49,9 @@ func main() {
 	subService := service.NewSubscriptionService(subscriptionRepo, catalogService, billingService, metrics)
 	paymentsService := service.NewPaymentsService(metrics, registry)
 	automationService := service.NewAutomationService(metrics)
+	authService := service.NewAuthService(userRepo, sessionRepo, config.JWTSecret, config.JWTExpiration)
+	cartService := service.NewCartService(cartRepo, productRepo)
+	emailService := service.NewEmailService(config)
 
 	server := api.NewServer(
 		config,
@@ -60,6 +66,9 @@ func main() {
 		subService,
 		paymentsService,
 		automationService,
+		authService,
+		cartService,
+		emailService,
 	)
 
 	httpServer := &http.Server{
