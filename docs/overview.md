@@ -14,8 +14,12 @@
 - `OrderService` 处理订单生命周期。
 - `HostingService` 管理 VPS 与 IP 分配。
 - `SupportService` 管理工单。
-- `PaymentsService` 预留支付通道对接。
+- `PaymentsService` 管理支付通道与插件调用。
 - `AutomationService` 维护自动化作业。
+
+## plugins
+- `internal/plugins` 提供支付插件接口与注册表。
+- `internal/plugins/providers` 包含支付宝当面付、银联、Stripe、虚拟币的示例实现。
 
 ## infra
 - `Repository` 展示可替换的数据访问模式。

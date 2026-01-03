@@ -72,6 +72,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/hosting/ips", s.handleIPs)
 	mux.HandleFunc("/support/tickets", s.handleTickets)
 	mux.HandleFunc("/payments/gateways", s.handleGateways)
+	mux.HandleFunc("/payments/plugins/charge", s.handlePluginCharge)
 	mux.HandleFunc("/automation/jobs", s.handleJobs)
 	return mux
 }

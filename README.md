@@ -12,6 +12,7 @@
 - IP 分配
 - 优惠券与循环优惠券
 - 支付通道对接与收款记录
+- 支付插件机制（支付宝当面付 / 银联 / Stripe / 虚拟币）
 - 客户支持（工单）
 - 自动化任务（可扩展）
 - 可替换前端主题（配置驱动）
@@ -26,6 +27,7 @@ xlpanel/
 │  ├─ core/             # 全局配置与基础能力
 │  ├─ domain/           # 领域模型
 │  ├─ infra/            # 基础设施（仓储 / 观测）
+│  ├─ plugins/          # 支付插件接口与实现
 │  └─ service/          # 业务服务
 └─ docs/                # 架构与使用文档
 ```
@@ -43,5 +45,6 @@ go run ./cmd/server
 - [架构设计](docs/architecture.md)
 - [模块说明](docs/overview.md)
 - [API 示例](docs/api.md)
+- [支付插件](docs/payment_plugins.md)
 - [主题与前端](docs/theming.md)
 - [自动化与集成](docs/automation.md)

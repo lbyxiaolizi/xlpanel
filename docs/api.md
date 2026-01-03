@@ -74,6 +74,14 @@ curl -X POST http://127.0.0.1:8080/billing/payments \
   -d '{"tenant_id": "<tenant>", "customer_id": "<id>", "invoice_id": "<invoice>", "amount": 99, "currency": "USD", "method": "card"}'
 ```
 
+## 支付插件
+
+```bash
+curl -X POST http://127.0.0.1:8080/payments/plugins/charge \
+  -H 'Content-Type: application/json' \
+  -d '{"provider": "stripe", "tenant_id": "<tenant>", "customer_id": "<customer>", "invoice_id": "<invoice>", "amount": 99, "currency": "USD"}'
+```
+
 ## 支付通道
 
 ```bash

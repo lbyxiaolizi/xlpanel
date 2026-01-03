@@ -8,6 +8,8 @@ import (
 	"xlpanel/internal/core"
 	"xlpanel/internal/domain"
 	"xlpanel/internal/infra"
+	"xlpanel/internal/plugins"
+	"xlpanel/internal/plugins/providers"
 	"xlpanel/internal/service"
 )
 
@@ -25,13 +27,19 @@ func main() {
 	ipRepo := infra.NewRepository(func(ip domain.IPAllocation) string { return ip.ID })
 	ticketRepo := infra.NewRepository(func(t domain.Ticket) string { return t.ID })
 
+	registry := plugins.NewRegistry()
+	registry.Register(providers.NewAlipayFaceToFace())
+	registry.Register(providers.NewUnionPay())
+	registry.Register(providers.NewStripe())
+	registry.Register(providers.NewCrypto())
+
 	billingService := service.NewBillingService(invoiceRepo, infra.NewCouponRepository(), paymentRepo, metrics)
 	orderService := service.NewOrderService(orderRepo, metrics)
 	hostingService := service.NewHostingService(vpsRepo, ipRepo, metrics)
 	supportService := service.NewSupportService(ticketRepo, metrics)
 	catalogService := service.NewCatalogService(productRepo)
 	subService := service.NewSubscriptionService(subscriptionRepo, catalogService, billingService, metrics)
-	paymentsService := service.NewPaymentsService(metrics)
+	paymentsService := service.NewPaymentsService(metrics, registry)
 	automationService := service.NewAutomationService(metrics)
 
 	server := api.NewServer(
