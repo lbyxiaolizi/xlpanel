@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -139,7 +141,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/payments/gateways", s.handleGateways)
 	mux.HandleFunc("/payments/plugins/charge", s.handlePluginCharge)
 	mux.HandleFunc("/automation/jobs", s.handleJobs)
-	
+
 	// Auth routes
 	mux.HandleFunc("/login", s.handleLoginPage)
 	mux.HandleFunc("/register", s.handleRegisterPage)
@@ -149,17 +151,17 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/api/2fa/enable", s.handle2FAEnable)
 	mux.HandleFunc("/api/2fa/verify", s.handle2FAVerify)
 	mux.HandleFunc("/api/2fa/disable", s.handle2FADisable)
-	
+
 	// Customer routes
 	mux.HandleFunc("/customer", s.handleCustomerDashboard)
 	mux.HandleFunc("/customer/products", s.handleCustomerProducts)
 	mux.HandleFunc("/customer/cart", s.handleCustomerCart)
 	mux.HandleFunc("/customer/orders", s.handleCustomerOrders)
 	mux.HandleFunc("/customer/invoices", s.handleCustomerInvoices)
-	
+
 	// Admin routes
 	mux.HandleFunc("/admin/users", s.handleAdminUsers)
-	
+
 	// Cart API routes
 	mux.HandleFunc("/api/cart", s.handleCartGet)
 	mux.HandleFunc("/api/cart/add", s.handleCartAdd)
@@ -167,10 +169,10 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/api/cart/remove", s.handleCartRemove)
 	mux.HandleFunc("/api/cart/clear", s.handleCartClear)
 	mux.HandleFunc("/api/cart/checkout", s.handleCartCheckout)
-	
+
 	// User API routes
 	mux.HandleFunc("/api/users", s.handleUsersAPI)
-	
+
 	return s.applyMiddlewares(mux)
 }
 
@@ -297,8 +299,31 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Prepare data
-	data := map[string]string{
-		"Title": "Dashboard",
+	customers := s.customers.List()
+	orders := s.orderService.ListOrders()
+	subscriptions := s.subService.ListSubscriptions()
+	vpsInstances := s.hostingService.ListVPS()
+	invoices := s.billingService.ListInvoices()
+	payments := s.billingService.ListPayments()
+	tickets := s.supportService.ListTickets()
+
+	activeServices := len(subscriptions) + len(vpsInstances)
+	unpaidCount, unpaidAmounts := summarizeUnpaidInvoices(invoices)
+	unpaidCurrency, unpaidTotal := formatCurrencyTotals(unpaidAmounts)
+	monthlyCurrency, monthlyRevenue := formatCurrencyTotals(sumPaymentsLast30Days(payments))
+
+	data := dashboardData{
+		Title: "Dashboard",
+		Stats: dashboardStats{
+			ActiveServices:     activeServices,
+			UnpaidInvoices:     unpaidCount,
+			UnpaidAmount:       unpaidTotal,
+			UnpaidCurrency:     unpaidCurrency,
+			TotalCustomers:     len(customers),
+			MonthlyRevenue:     monthlyRevenue,
+			MonthlyRevenueCode: monthlyCurrency,
+		},
+		RecentActivities: buildRecentActivities(customers, orders, invoices, payments, tickets),
 	}
 
 	// Execute template
@@ -306,6 +331,206 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error executing template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
+	}
+}
+
+type dashboardData struct {
+	Title            string
+	Stats            dashboardStats
+	RecentActivities []dashboardActivity
+}
+
+type dashboardStats struct {
+	ActiveServices     int
+	UnpaidInvoices     int
+	UnpaidAmount       string
+	UnpaidCurrency     string
+	TotalCustomers     int
+	MonthlyRevenue     string
+	MonthlyRevenueCode string
+}
+
+type dashboardActivity struct {
+	Icon      string
+	IconBg    string
+	IconColor string
+	Title     string
+	Subtitle  string
+	Time      string
+}
+
+type activityEvent struct {
+	occurred time.Time
+	item     dashboardActivity
+}
+
+func summarizeUnpaidInvoices(invoices []domain.Invoice) (int, map[string]float64) {
+	count := 0
+	amounts := make(map[string]float64)
+	for _, invoice := range invoices {
+		if strings.EqualFold(invoice.Status, "unpaid") {
+			count++
+			currency := invoice.Currency
+			if currency == "" {
+				currency = "USD"
+			}
+			amounts[currency] += invoice.Amount
+		}
+	}
+	return count, amounts
+}
+
+func sumPaymentsLast30Days(payments []domain.Payment) map[string]float64 {
+	totals := make(map[string]float64)
+	cutoff := time.Now().AddDate(0, 0, -30)
+	for _, payment := range payments {
+		if payment.ReceivedAt.IsZero() || payment.ReceivedAt.Before(cutoff) {
+			continue
+		}
+		currency := payment.Currency
+		if currency == "" {
+			currency = "USD"
+		}
+		totals[currency] += payment.Amount
+	}
+	return totals
+}
+
+func formatCurrencyTotals(amounts map[string]float64) (string, string) {
+	if len(amounts) == 0 {
+		return "USD", "0.00"
+	}
+	if len(amounts) == 1 {
+		for currency, total := range amounts {
+			return currency, fmt.Sprintf("%.2f", total)
+		}
+	}
+	total := 0.0
+	for _, amount := range amounts {
+		total += amount
+	}
+	return "Multiple", fmt.Sprintf("%.2f", total)
+}
+
+func buildRecentActivities(
+	customers []domain.Customer,
+	orders []domain.Order,
+	invoices []domain.Invoice,
+	payments []domain.Payment,
+	tickets []domain.Ticket,
+) []dashboardActivity {
+	events := make([]activityEvent, 0, len(customers)+len(orders)+len(payments)+len(tickets))
+
+	for _, customer := range customers {
+		if customer.CreatedAt.IsZero() {
+			continue
+		}
+		events = append(events, activityEvent{
+			occurred: customer.CreatedAt,
+			item: dashboardActivity{
+				Icon:      "fa-user-plus",
+				IconBg:    "bg-purple-100",
+				IconColor: "text-purple-600",
+				Title:     "New customer registered",
+				Subtitle:  fmt.Sprintf("Name: %s • Email: %s", customer.Name, customer.Email),
+				Time:      formatRelativeTime(customer.CreatedAt),
+			},
+		})
+	}
+
+	for _, order := range orders {
+		if order.CreatedAt.IsZero() {
+			continue
+		}
+		title := "New order created"
+		if order.ID != "" {
+			title = fmt.Sprintf("New order %s created", order.ID)
+		}
+		events = append(events, activityEvent{
+			occurred: order.CreatedAt,
+			item: dashboardActivity{
+				Icon:      "fa-shopping-cart",
+				IconBg:    "bg-blue-100",
+				IconColor: "text-blue-600",
+				Title:     title,
+				Subtitle:  fmt.Sprintf("Product: %s • Qty: %d", order.ProductCode, order.Quantity),
+				Time:      formatRelativeTime(order.CreatedAt),
+			},
+		})
+	}
+
+	for _, payment := range payments {
+		if payment.ReceivedAt.IsZero() {
+			continue
+		}
+		method := payment.Method
+		if method == "" {
+			method = "unknown"
+		}
+		currency := payment.Currency
+		if currency == "" {
+			currency = "USD"
+		}
+		events = append(events, activityEvent{
+			occurred: payment.ReceivedAt,
+			item: dashboardActivity{
+				Icon:      "fa-credit-card",
+				IconBg:    "bg-green-100",
+				IconColor: "text-green-600",
+				Title:     "Payment received",
+				Subtitle:  fmt.Sprintf("Amount: %s %.2f • Method: %s", currency, payment.Amount, method),
+				Time:      formatRelativeTime(payment.ReceivedAt),
+			},
+		})
+	}
+
+	for _, ticket := range tickets {
+		if ticket.CreatedAt.IsZero() {
+			continue
+		}
+		events = append(events, activityEvent{
+			occurred: ticket.CreatedAt,
+			item: dashboardActivity{
+				Icon:      "fa-ticket-alt",
+				IconBg:    "bg-yellow-100",
+				IconColor: "text-yellow-600",
+				Title:     "New support ticket opened",
+				Subtitle:  fmt.Sprintf("Subject: %s", ticket.Subject),
+				Time:      formatRelativeTime(ticket.CreatedAt),
+			},
+		})
+	}
+
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].occurred.After(events[j].occurred)
+	})
+
+	limit := 5
+	if len(events) < limit {
+		limit = len(events)
+	}
+
+	activities := make([]dashboardActivity, 0, limit)
+	for i := 0; i < limit; i++ {
+		activities = append(activities, events[i].item)
+	}
+	return activities
+}
+
+func formatRelativeTime(t time.Time) string {
+	if t.IsZero() {
+		return "unknown"
+	}
+	elapsed := time.Since(t)
+	switch {
+	case elapsed < time.Minute:
+		return "just now"
+	case elapsed < time.Hour:
+		return fmt.Sprintf("%dm ago", int(elapsed.Minutes()))
+	case elapsed < 24*time.Hour:
+		return fmt.Sprintf("%dh ago", int(elapsed.Hours()))
+	default:
+		return fmt.Sprintf("%dd ago", int(elapsed.Hours()/24))
 	}
 }
 
@@ -476,34 +701,37 @@ func (s *Server) handleSubscriptionInvoices(w http.ResponseWriter, r *http.Reque
 }
 
 func (s *Server) handleInvoices(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
-	}
-	var req invoiceCreate
-	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	if req.Currency == "" {
-		req.Currency = "USD"
-	}
-	if req.TenantID == "" {
-		writeError(w, http.StatusBadRequest, "tenant_id is required")
-		return
-	}
-	if len(req.Lines) == 0 {
-		writeError(w, http.StatusBadRequest, "lines are required")
-		return
-	}
-	invoice := s.billingService.CreateInvoiceWithLines(req.TenantID, req.CustomerID, req.Lines, req.Currency)
-	if req.CouponCode != "" {
-		adjusted, ok := s.billingService.ApplyCoupon(req.CouponCode, invoice.Amount)
-		if ok {
-			invoice.Amount = adjusted
+	switch r.Method {
+	case http.MethodGet:
+		writeJSON(w, http.StatusOK, s.billingService.ListInvoices())
+	case http.MethodPost:
+		var req invoiceCreate
+		if err := decodeJSON(r, &req); err != nil {
+			writeError(w, http.StatusBadRequest, err.Error())
+			return
 		}
+		if req.Currency == "" {
+			req.Currency = "USD"
+		}
+		if req.TenantID == "" {
+			writeError(w, http.StatusBadRequest, "tenant_id is required")
+			return
+		}
+		if len(req.Lines) == 0 {
+			writeError(w, http.StatusBadRequest, "lines are required")
+			return
+		}
+		invoice := s.billingService.CreateInvoiceWithLines(req.TenantID, req.CustomerID, req.Lines, req.Currency)
+		if req.CouponCode != "" {
+			adjusted, ok := s.billingService.ApplyCoupon(req.CouponCode, invoice.Amount)
+			if ok {
+				invoice.Amount = adjusted
+			}
+		}
+		writeJSON(w, http.StatusCreated, invoice)
+	default:
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
-	writeJSON(w, http.StatusCreated, invoice)
 }
 
 func (s *Server) handleCoupons(w http.ResponseWriter, r *http.Request) {
@@ -533,31 +761,34 @@ func (s *Server) handleCoupons(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlePayments(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	switch r.Method {
+	case http.MethodGet:
+		writeJSON(w, http.StatusOK, s.billingService.ListPayments())
+	case http.MethodPost:
+		var req paymentCreate
+		if err := decodeJSON(r, &req); err != nil {
+			writeError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		if req.Amount <= 0 {
+			writeError(w, http.StatusBadRequest, "amount must be positive")
+			return
+		}
+		if req.Currency == "" {
+			req.Currency = "USD"
+		}
+		payment := domain.Payment{
+			TenantID:   req.TenantID,
+			CustomerID: req.CustomerID,
+			InvoiceID:  req.InvoiceID,
+			Amount:     req.Amount,
+			Currency:   req.Currency,
+			Method:     req.Method,
+		}
+		writeJSON(w, http.StatusCreated, s.billingService.RecordPayment(payment))
+	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
-		return
 	}
-	var req paymentCreate
-	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	if req.Amount <= 0 {
-		writeError(w, http.StatusBadRequest, "amount must be positive")
-		return
-	}
-	if req.Currency == "" {
-		req.Currency = "USD"
-	}
-	payment := domain.Payment{
-		TenantID:   req.TenantID,
-		CustomerID: req.CustomerID,
-		InvoiceID:  req.InvoiceID,
-		Amount:     req.Amount,
-		Currency:   req.Currency,
-		Method:     req.Method,
-	}
-	writeJSON(w, http.StatusCreated, s.billingService.RecordPayment(payment))
 }
 
 func (s *Server) handleVPS(w http.ResponseWriter, r *http.Request) {
@@ -806,13 +1037,13 @@ func isPublicRoute(path string) bool {
 		"/customer/products",
 		"/catalog/products",
 	}
-	
+
 	for _, route := range publicRoutes {
 		if path == route {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

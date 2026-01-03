@@ -99,3 +99,11 @@ func (s *BillingService) RecordPayment(payment domain.Payment) domain.Payment {
 	s.metrics.Increment("payment_received")
 	return s.payments.Add(payment)
 }
+
+func (s *BillingService) ListInvoices() []domain.Invoice {
+	return s.invoices.List()
+}
+
+func (s *BillingService) ListPayments() []domain.Payment {
+	return s.payments.List()
+}
