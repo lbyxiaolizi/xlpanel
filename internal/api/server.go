@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"xlpanel/internal/core"
@@ -28,7 +29,8 @@ type Server struct {
 	subService      *service.SubscriptionService
 	paymentsService *service.PaymentsService
 	autoService     *service.AutomationService
-	indexTemplate   *template.Template
+	templates       map[string]*template.Template
+	templateMu      sync.RWMutex
 }
 
 func NewServer(
@@ -58,28 +60,38 @@ func NewServer(
 		subService:      subService,
 		paymentsService: paymentsService,
 		autoService:     autoService,
+		templates:       make(map[string]*template.Template),
 	}
 
 	// Parse and cache templates at startup
-	if err := s.loadTemplates(); err != nil {
+	if _, err := s.loadTemplate(config.DefaultTheme); err != nil {
 		log.Printf("Warning: failed to load templates: %v", err)
 	}
 
 	return s
 }
 
-func (s *Server) loadTemplates() error {
+func (s *Server) loadTemplate(theme string) (*template.Template, error) {
 	// Validate theme name to prevent path traversal
-	theme := s.config.DefaultTheme
-	// Check for empty, path separators, or relative path components
-	if theme == "" || 
-	   filepath.Base(theme) != theme || 
-	   theme == "." || 
-	   theme == ".." ||
-	   strings.Contains(theme, "/") ||
-	   strings.Contains(theme, "\\") {
-		return filepath.ErrBadPattern
+	if theme == "" {
+		theme = s.config.DefaultTheme
 	}
+	// Check for empty, path separators, or relative path components
+	if theme == "" ||
+		filepath.Base(theme) != theme ||
+		theme == "." ||
+		theme == ".." ||
+		strings.Contains(theme, "/") ||
+		strings.Contains(theme, "\\") {
+		return nil, filepath.ErrBadPattern
+	}
+
+	s.templateMu.RLock()
+	if tmpl, ok := s.templates[theme]; ok {
+		s.templateMu.RUnlock()
+		return tmpl, nil
+	}
+	s.templateMu.RUnlock()
 
 	// Build theme path
 	themePath := filepath.Join("frontend", "themes", theme)
@@ -89,11 +101,13 @@ func (s *Server) loadTemplates() error {
 	// Parse templates
 	tmpl, err := template.ParseFiles(basePath, homePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	s.indexTemplate = tmpl
-	return nil
+	s.templateMu.Lock()
+	s.templates[theme] = tmpl
+	s.templateMu.Unlock()
+	return tmpl, nil
 }
 
 func (s *Server) Routes() http.Handler {
@@ -115,7 +129,7 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("/payments/gateways", s.handleGateways)
 	mux.HandleFunc("/payments/plugins/charge", s.handlePluginCharge)
 	mux.HandleFunc("/automation/jobs", s.handleJobs)
-	return mux
+	return s.applyMiddlewares(mux)
 }
 
 type customerCreate struct {
@@ -226,9 +240,16 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if templates are loaded
-	if s.indexTemplate == nil {
-		log.Printf("Templates not loaded")
+	theme := s.config.DefaultTheme
+	if s.config.AllowThemeOverride {
+		if requested := r.URL.Query().Get("theme"); requested != "" {
+			theme = requested
+		}
+	}
+
+	tmpl, err := s.loadTemplate(theme)
+	if err != nil {
+		log.Printf("Templates not loaded: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -239,7 +260,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Execute template
-	if err := s.indexTemplate.ExecuteTemplate(w, "base.html", data); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "base.html", data); err != nil {
 		log.Printf("Error executing template: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -624,4 +645,151 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, map[string]string{"error": message})
+}
+
+type responseRecorder struct {
+	http.ResponseWriter
+	status int
+	size   int
+}
+
+func (r *responseRecorder) WriteHeader(status int) {
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
+}
+
+func (r *responseRecorder) Write(data []byte) (int, error) {
+	if r.status == 0 {
+		r.status = http.StatusOK
+	}
+	n, err := r.ResponseWriter.Write(data)
+	r.size += n
+	return n, err
+}
+
+func (s *Server) applyMiddlewares(next http.Handler) http.Handler {
+	return s.withRecovery(s.withSecurityHeaders(s.withRequestID(s.withBodyLimit(s.withAuth(s.withLogging(next))))))
+}
+
+func (s *Server) withLogging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		rec := &responseRecorder{ResponseWriter: w}
+		next.ServeHTTP(rec, r)
+		duration := time.Since(start)
+		requestID := r.Header.Get("X-Request-ID")
+		log.Printf("request_id=%s method=%s path=%s status=%d duration=%s bytes=%d remote=%s",
+			requestID,
+			r.Method,
+			r.URL.Path,
+			rec.status,
+			duration.String(),
+			rec.size,
+			clientIP(r),
+		)
+	})
+}
+
+func (s *Server) withRecovery(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if recovered := recover(); recovered != nil {
+				requestID := r.Header.Get("X-Request-ID")
+				log.Printf("panic request_id=%s err=%v", requestID, recovered)
+				writeError(w, http.StatusInternalServerError, "internal server error")
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) withRequestID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-Request-ID") == "" {
+			r.Header.Set("X-Request-ID", core.NewID())
+		}
+		w.Header().Set("X-Request-ID", r.Header.Get("X-Request-ID"))
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) withSecurityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "same-origin")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) withBodyLimit(next http.Handler) http.Handler {
+	if s.config.MaxBodyBytes <= 0 {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost, http.MethodPut, http.MethodPatch:
+			r.Body = http.MaxBytesReader(w, r.Body, s.config.MaxBodyBytes)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) withAuth(next http.Handler) http.Handler {
+	if s.config.APIKey == "" {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isPublicRoute(r.URL.Path) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		if authorized(r, s.config.APIKey) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		writeError(w, http.StatusUnauthorized, "unauthorized")
+	})
+}
+
+func isPublicRoute(path string) bool {
+	return path == "/" || path == "/health"
+}
+
+func authorized(r *http.Request, apiKey string) bool {
+	if apiKey == "" {
+		return true
+	}
+	if key := strings.TrimSpace(r.Header.Get("X-API-Key")); key != "" {
+		return key == apiKey
+	}
+	if auth := strings.TrimSpace(r.Header.Get("Authorization")); auth != "" {
+		const prefix = "Bearer "
+		if strings.HasPrefix(auth, prefix) {
+			return strings.TrimPrefix(auth, prefix) == apiKey
+		}
+	}
+	return false
+}
+
+func clientIP(r *http.Request) string {
+	forwarded := r.Header.Get("X-Forwarded-For")
+	if forwarded != "" {
+		parts := strings.Split(forwarded, ",")
+		if len(parts) > 0 {
+			return strings.TrimSpace(parts[0])
+		}
+	}
+	if realIP := strings.TrimSpace(r.Header.Get("X-Real-IP")); realIP != "" {
+		return realIP
+	}
+	host := r.RemoteAddr
+	if host == "" {
+		return ""
+	}
+	if strings.Contains(host, ":") {
+		return strings.Split(host, ":")[0]
+	}
+	return host
 }
