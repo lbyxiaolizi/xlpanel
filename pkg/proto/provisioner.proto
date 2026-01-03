@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package openhost.plugin.provisioner.v1;
+
+option go_package = "github.com/openhost/openhost/pkg/proto/provisioner/v1;provisionerv1";
+
+service ProvisionerService {
+  rpc CreateService(CreateServiceRequest) returns (CreateServiceResponse);
+  rpc Suspend(SuspendRequest) returns (SuspendResponse);
+  rpc Terminate(TerminateRequest) returns (TerminateResponse);
+  rpc ChangePackage(ChangePackageRequest) returns (ChangePackageResponse);
+  rpc PowerControl(PowerControlRequest) returns (PowerControlResponse);
+  rpc GetUsage(GetUsageRequest) returns (GetUsageResponse);
+}
+
+message CreateServiceRequest {
+  string service_id = 1;
+  string customer_id = 2;
+  string package_id = 3;
+  map<string, string> options = 4;
+}
+
+message CreateServiceResponse {
+  string external_id = 1;
+  string message = 2;
+}
+
+message SuspendRequest {
+  string service_id = 1;
+  string reason = 2;
+}
+
+message SuspendResponse {
+  string message = 1;
+}
+
+message TerminateRequest {
+  string service_id = 1;
+  string reason = 2;
+}
+
+message TerminateResponse {
+  string message = 1;
+}
+
+message ChangePackageRequest {
+  string service_id = 1;
+  string current_package_id = 2;
+  string target_package_id = 3;
+  string reason = 4;
+}
+
+message ChangePackageResponse {
+  string message = 1;
+}
+
+enum PowerAction {
+  POWER_ACTION_UNSPECIFIED = 0;
+  POWER_ACTION_START = 1;
+  POWER_ACTION_STOP = 2;
+  POWER_ACTION_REBOOT = 3;
+}
+
+message PowerControlRequest {
+  string service_id = 1;
+  PowerAction action = 2;
+}
+
+message PowerControlResponse {
+  string message = 1;
+}
+
+message GetUsageRequest {
+  string service_id = 1;
+}
+
+message UsageMetric {
+  string name = 1;
+  string unit = 2;
+  double value = 3;
+}
+
+message GetUsageResponse {
+  repeated UsageMetric metrics = 1;
+  string message = 2;
+}
