@@ -1,0 +1,268 @@
+{{ define "content" }}
+<section class="cart-section">
+    <div class="container">
+        <div class="page-header">
+            <h1>购物车</h1>
+            <p>查看您选择的产品并完成购买</p>
+        </div>
+        
+        <div class="cart-layout">
+            <div class="cart-main">
+                <div class="cart-items" id="cartItems">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cart-sidebar">
+                <div class="cart-summary">
+                    <h2>订单摘要</h2>
+                    <div class="summary-row">
+                        <span>小计</span>
+                        <span id="subtotal">¥0.00</span>
+                    </div>
+                    <div class="summary-row discount" id="discountRow" style="display: none;">
+                        <span>折扣</span>
+                        <span id="discount">-¥0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>税费</span>
+                        <span id="tax">¥0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>总计</span>
+                        <span id="total">¥0.00</span>
+                    </div>
+                    
+                    <div class="coupon-section">
+                        <div class="coupon-input">
+                            <input type="text" id="couponCode" placeholder="优惠码">
+                            <button type="button" class="btn btn-outline" id="applyCoupon">应用</button>
+                        </div>
+                        <div id="couponMessage"></div>
+                    </div>
+                    
+                    <a href="/checkout" class="btn btn-primary btn-block" id="checkoutBtn">
+                        结账
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                            <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </a>
+                    
+                    <a href="/products" class="continue-shopping">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                        继续选购
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.cart-section { padding: 4rem 0; min-height: 70vh; }
+.page-header { margin-bottom: 2rem; }
+.page-header h1 { font-size: 2rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
+.page-header p { color: #64748b; }
+.cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; }
+.cart-main { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.cart-items { padding: 1.5rem; min-height: 300px; }
+.cart-item { display: flex; gap: 1.5rem; padding: 1.5rem 0; border-bottom: 1px solid #e2e8f0; }
+.cart-item:last-child { border-bottom: none; }
+.item-image { width: 80px; height: 80px; background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; color: #667eea; }
+.item-details { flex: 1; }
+.item-name { font-weight: 600; color: #1e293b; margin-bottom: 0.25rem; }
+.item-description { font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem; }
+.item-billing { font-size: 0.875rem; color: #94a3b8; }
+.item-price { text-align: right; }
+.item-amount { font-size: 1.25rem; font-weight: 700; color: #1e293b; display: block; }
+.item-cycle { font-size: 0.875rem; color: #64748b; }
+.item-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.btn-icon { padding: 0.5rem; background: none; border: 1px solid #e2e8f0; border-radius: 0.375rem; cursor: pointer; color: #64748b; transition: all 0.2s; }
+.btn-icon:hover { color: #ef4444; border-color: #ef4444; }
+.cart-sidebar { position: sticky; top: 2rem; }
+.cart-summary { background: white; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+.cart-summary h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; color: #1e293b; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: #64748b; }
+.summary-row.discount span:last-child { color: #16a34a; }
+.summary-row.total { padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 1.25rem; font-weight: 700; color: #1e293b; }
+.coupon-section { margin: 1.5rem 0; }
+.coupon-input { display: flex; gap: 0.5rem; }
+.coupon-input input { flex: 1; padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; }
+.coupon-input .btn { flex-shrink: 0; }
+#couponMessage { margin-top: 0.5rem; font-size: 0.875rem; }
+#couponMessage.success { color: #16a34a; }
+#couponMessage.error { color: #ef4444; }
+.btn-block { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1rem; }
+.continue-shopping { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1rem; color: #667eea; text-decoration: none; font-size: 0.875rem; }
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: #94a3b8; }
+.spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-cart { text-align: center; padding: 4rem 2rem; }
+.empty-cart svg { margin-bottom: 1rem; color: #94a3b8; }
+.empty-cart h3 { margin-bottom: 0.5rem; color: #1e293b; }
+.empty-cart p { color: #64748b; margin-bottom: 1.5rem; }
+@media (max-width: 768px) { .cart-layout { grid-template-columns: 1fr; } .cart-sidebar { position: static; } }
+</style>
+
+<script>
+let cartData = null;
+
+async function loadCart() {
+    const container = document.getElementById('cartItems');
+    try {
+        const res = await fetch('/api/v1/cart', {
+            headers: { 'X-Session-ID': getSessionId() }
+        });
+        if (!res.ok) throw new Error('Failed to load cart');
+        
+        cartData = await res.json();
+        renderCart(cartData);
+        updateSummary(cartData);
+    } catch (error) {
+        container.innerHTML = `
+            <div class="empty-cart">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="m1 1 4 4h16l-2.5 7H7.1"/>
+                </svg>
+                <h3>购物车是空的</h3>
+                <p>您还没有添加任何产品到购物车</p>
+                <a href="/products" class="btn btn-primary">浏览产品</a>
+            </div>
+        `;
+        document.getElementById('checkoutBtn').style.display = 'none';
+    }
+}
+
+function renderCart(data) {
+    const container = document.getElementById('cartItems');
+    
+    if (!data.items || !data.items.length) {
+        container.innerHTML = `
+            <div class="empty-cart">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="m1 1 4 4h16l-2.5 7H7.1"/>
+                </svg>
+                <h3>购物车是空的</h3>
+                <p>您还没有添加任何产品到购物车</p>
+                <a href="/products" class="btn btn-primary">浏览产品</a>
+            </div>
+        `;
+        document.getElementById('checkoutBtn').style.display = 'none';
+        return;
+    }
+    
+    container.innerHTML = data.items.map(item => `
+        <div class="cart-item" data-id="${item.id}">
+            <div class="item-image">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+            </div>
+            <div class="item-details">
+                <div class="item-name">${item.product_name}</div>
+                <div class="item-description">${item.hostname || item.domain || '未配置'}</div>
+                <div class="item-billing">计费周期: ${getBillingCycleText(item.billing_cycle)}</div>
+                <div class="item-actions">
+                    <button class="btn-icon" onclick="removeItem(${item.id})" title="移除">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="item-price">
+                <span class="item-amount">¥${item.total}</span>
+                <span class="item-cycle">/${getBillingCycleText(item.billing_cycle)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateSummary(data) {
+    document.getElementById('subtotal').textContent = `¥${data.subtotal}`;
+    document.getElementById('tax').textContent = `¥${data.tax}`;
+    document.getElementById('total').textContent = `¥${data.total}`;
+    
+    if (parseFloat(data.total_discount) > 0) {
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('discount').textContent = `-¥${data.total_discount}`;
+    }
+    
+    if (data.coupon_code) {
+        document.getElementById('couponCode').value = data.coupon_code;
+        document.getElementById('couponMessage').textContent = '优惠码已应用';
+        document.getElementById('couponMessage').className = 'success';
+    }
+}
+
+async function removeItem(itemId) {
+    try {
+        const res = await fetch(`/api/v1/cart/items/${itemId}`, {
+            method: 'DELETE',
+            headers: { 'X-Session-ID': getSessionId() }
+        });
+        if (res.ok) loadCart();
+    } catch (error) {
+        console.error('Error removing item:', error);
+    }
+}
+
+document.getElementById('applyCoupon')?.addEventListener('click', async function() {
+    const code = document.getElementById('couponCode').value.trim();
+    if (!code) return;
+    
+    const messageEl = document.getElementById('couponMessage');
+    
+    try {
+        const res = await fetch('/api/v1/cart/coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Session-ID': getSessionId()
+            },
+            body: JSON.stringify({ code })
+        });
+        
+        if (res.ok) {
+            messageEl.textContent = '优惠码已应用';
+            messageEl.className = 'success';
+            loadCart();
+        } else {
+            messageEl.textContent = '无效的优惠码';
+            messageEl.className = 'error';
+        }
+    } catch (error) {
+        messageEl.textContent = '应用优惠码失败';
+        messageEl.className = 'error';
+    }
+});
+
+function getBillingCycleText(cycle) {
+    const map = { monthly: '月', quarterly: '季度', annually: '年', yearly: '年' };
+    return map[cycle] || cycle;
+}
+
+function getSessionId() {
+    let sessionId = localStorage.getItem('cart_session_id');
+    if (!sessionId) {
+        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('cart_session_id', sessionId);
+    }
+    return sessionId;
+}
+
+document.addEventListener('DOMContentLoaded', loadCart);
+</script>
+{{ end }}

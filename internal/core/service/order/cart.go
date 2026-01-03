@@ -74,7 +74,7 @@ func (s *CartService) createCart(customerID *uint64, sessionID string) (*domain.
 }
 
 // AddItem adds a product to the cart
-func (s *CartService) AddItem(cartID, productID uint64, quantity int, billingCycle, domain, hostname string, configOptions domain.JSONMap) (*domain.CartItem, error) {
+func (s *CartService) AddItem(cartID, productID uint64, quantity int, billingCycle, domainName, hostname string, configOptions domain.JSONMap) (*domain.CartItem, error) {
 	if quantity <= 0 {
 		quantity = 1
 	}
@@ -111,7 +111,7 @@ func (s *CartService) AddItem(cartID, productID uint64, quantity int, billingCyc
 		Quantity:      quantity,
 		BillingCycle:  billingCycle,
 		ConfigOptions: configOptions,
-		Domain:        domain,
+		Domain:        domainName,
 		Hostname:      hostname,
 		SetupFee:      setupFee,
 		RecurringFee:  recurringFee,

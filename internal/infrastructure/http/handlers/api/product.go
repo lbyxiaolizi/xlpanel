@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/openhost/openhost/internal/core/domain"
 	"github.com/openhost/openhost/internal/core/service/product"
 )
 
