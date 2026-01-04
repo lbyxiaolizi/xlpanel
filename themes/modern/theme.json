@@ -1,0 +1,90 @@
+{
+  "name": "OpenHost Modern",
+  "slug": "modern",
+  "version": "1.0.0",
+  "author": "OpenHost Team",
+  "author_url": "https://github.com/lbyxiaolizi/xlpanel",
+  "description": "A modern, production-ready theme for OpenHost server management panel with decoupled architecture, full i18n support, dark mode, and responsive design.",
+  "license": "MIT",
+  "screenshot": "assets/images/screenshot.png",
+  "type": "both",
+  "min_openhost_version": "1.0.0",
+  "supports": {
+    "dark_mode": true,
+    "rtl": true,
+    "custom_css": true,
+    "custom_js": true,
+    "custom_header": true,
+    "custom_footer": true,
+    "color_schemes": true
+  },
+  "settings": {
+    "primary_color": "#6366f1",
+    "secondary_color": "#8b5cf6",
+    "accent_color": "#ec4899",
+    "logo_url": "",
+    "favicon_url": "",
+    "footer_text": "",
+    "show_language_switcher": true,
+    "show_dark_mode_toggle": true,
+    "social_links": {
+      "github": "",
+      "twitter": "",
+      "discord": ""
+    }
+  },
+  "layouts": {
+    "public": "layouts/public.html",
+    "client": "layouts/client.html",
+    "admin": "layouts/admin.html",
+    "auth": "layouts/auth.html"
+  },
+  "pages": {
+    "home": "pages/home.html",
+    "products": "pages/products.html",
+    "pricing": "pages/pricing.html",
+    "login": "pages/login.html",
+    "register": "pages/register.html",
+    "cart": "pages/cart.html",
+    "checkout": "pages/checkout.html",
+    "contact": "pages/contact.html",
+    "about": "pages/about.html",
+    "docs": "pages/docs.html",
+    "client_dashboard": "pages/client/dashboard.html",
+    "client_services": "pages/client/services.html",
+    "client_invoices": "pages/client/invoices.html",
+    "client_tickets": "pages/client/tickets.html",
+    "client_profile": "pages/client/profile.html",
+    "client_security": "pages/client/security.html",
+    "client_domains": "pages/client/domains.html",
+    "client_affiliates": "pages/client/affiliates.html",
+    "admin_dashboard": "pages/admin/dashboard.html",
+    "admin_customers": "pages/admin/customers.html",
+    "admin_products": "pages/admin/products.html",
+    "admin_orders": "pages/admin/orders.html",
+    "admin_services": "pages/admin/services.html",
+    "admin_invoices": "pages/admin/invoices.html",
+    "admin_tickets": "pages/admin/tickets.html",
+    "admin_settings": "pages/admin/settings.html",
+    "admin_servers": "pages/admin/servers.html"
+  },
+  "assets": {
+    "css": ["assets/css/main.css"],
+    "js": ["assets/js/main.js"]
+  },
+  "hooks": [
+    "head_start",
+    "head_end",
+    "body_start",
+    "body_end",
+    "navbar_start",
+    "navbar_end",
+    "sidebar_start",
+    "sidebar_end",
+    "footer_start",
+    "footer_end",
+    "dashboard_widgets",
+    "client_sidebar",
+    "admin_sidebar"
+  ]
+}
