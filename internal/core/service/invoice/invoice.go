@@ -9,13 +9,14 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/openhost/openhost/internal/core/domain"
+	"github.com/openhost/openhost/internal/core/service/tax"
 )
 
 var (
-	ErrInvoiceNotFound  = errors.New("invoice not found")
+	ErrInvoiceNotFound    = errors.New("invoice not found")
 	ErrInvoiceAlreadyPaid = errors.New("invoice is already paid")
-	ErrInvalidAmount    = errors.New("invalid payment amount")
-	ErrInvoiceCancelled = errors.New("invoice is cancelled")
+	ErrInvalidAmount      = errors.New("invalid payment amount")
+	ErrInvoiceCancelled   = errors.New("invoice is cancelled")
 )
 
 // Service provides invoice management operations
@@ -43,9 +44,13 @@ func (s *Service) CreateInvoice(customerID uint64, currency string, dueDate time
 
 	// Calculate totals
 	subtotal := decimal.Zero
+	taxableSubtotal := decimal.Zero
 	for _, item := range items {
 		itemTotal := item.UnitPrice.Mul(item.Quantity)
 		subtotal = subtotal.Add(itemTotal)
+		if item.Taxable {
+			taxableSubtotal = taxableSubtotal.Add(itemTotal.Sub(item.Discount))
+		}
 
 		invoice.LineItems = append(invoice.LineItems, domain.InvoiceItem{
 			ServiceID:   item.ServiceID,
@@ -61,8 +66,10 @@ func (s *Service) CreateInvoice(customerID uint64, currency string, dueDate time
 		})
 	}
 
-	// Calculate tax (simplified)
-	taxAmount := decimal.Zero // TODO: Calculate based on tax rules
+	taxAmount, err := tax.NewCalculator(s.db).CalculateForCustomer(customerID, taxableSubtotal)
+	if err != nil {
+		return nil, err
+	}
 
 	invoice.Subtotal = subtotal
 	invoice.TaxAmount = taxAmount
@@ -133,7 +140,7 @@ func (s *Service) CreateServiceRenewalInvoice(service *domain.Service, dueDate t
 		Currency:      service.Currency,
 		DueDate:       dueDate,
 		Subtotal:      service.RecurringAmount,
-		Total:         service.RecurringAmount, // Simplified, add tax calculation
+		Total:         service.RecurringAmount,
 		Balance:       service.RecurringAmount,
 		LineItems: []domain.InvoiceItem{
 			{
@@ -149,6 +156,14 @@ func (s *Service) CreateServiceRenewalInvoice(service *domain.Service, dueDate t
 			},
 		},
 	}
+
+	taxAmount, err := tax.NewCalculator(s.db).CalculateForCustomer(service.CustomerID, service.RecurringAmount)
+	if err != nil {
+		return nil, err
+	}
+	invoice.TaxAmount = taxAmount
+	invoice.Total = invoice.Subtotal.Add(taxAmount)
+	invoice.Balance = invoice.Total
 
 	if err := s.db.Create(invoice).Error; err != nil {
 		return nil, err

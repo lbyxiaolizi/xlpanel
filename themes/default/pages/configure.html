@@ -9,33 +9,42 @@
     <div class="grid grid-2">
         <div class="card">
             <h3>Configuration</h3>
-            <div class="form">
+            <form class="form" method="post" action="/order/configure/{{ .Product.Slug }}">
                 <div class="field">
-                    <label>Region</label>
-                    <select class="select">
-                        <option>US-East</option>
-                        <option>Europe</option>
-                        <option>Asia Pacific</option>
+                    <label>{{ t "pricing.billing_cycle" }}</label>
+                    <select class="select" name="billing_cycle">
+                        {{ range .Billing }}
+                        <option value="{{ . }}" {{ if eq . $.DefaultCycle }}selected{{ end }}>{{ . }}</option>
+                        {{ end }}
                     </select>
                 </div>
+                {{ range .ConfigGroups }}
+                    <div class="field">
+                        <label>{{ .Name }}</label>
+                        {{ range .Options }}
+                            <select class="select" name="option_{{ .ID }}">
+                                {{ range .SubOptions }}
+                                <option value="{{ .ID }}">{{ .Name }} {{ if .Price }}(+{{ .Price }}){{ end }}</option>
+                                {{ end }}
+                            </select>
+                        {{ end }}
+                    </div>
+                {{ end }}
                 <div class="field">
-                    <label>Plan</label>
-                    <select class="select">
-                        <option>Starter</option>
-                        <option>Growth</option>
-                        <option>Scale</option>
-                    </select>
+                    <label>{{ t "common.quantity" }}</label>
+                    <input class="input" type="number" name="quantity" min="1" value="1" />
                 </div>
-            </div>
+                <button class="button button-primary" type="submit">{{ t "products.order_now" }}</button>
+            </form>
         </div>
         <div class="card card-muted">
             <h3>{{ t "cart.summary" }}</h3>
             <div class="list">
-                <span>{{ t "common.subtotal" }}: $29.00</span>
-                <span>{{ t "common.tax" }}: $0.00</span>
-                <strong>{{ t "common.total" }}: $29.00</strong>
+                <span>{{ t "common.subtotal" }}: {{ .Currency }}{{ .Price }}</span>
+                <span>{{ t "common.tax" }}: 0.00</span>
+                <strong>{{ t "common.total" }}: {{ .Currency }}{{ .Price }}</strong>
             </div>
-            <a class="button button-primary" href="/cart">{{ t "products.order_now" }}</a>
+            <a class="button button-outline" href="/cart">{{ t "cart.checkout" }}</a>
         </div>
     </div>
 </section>

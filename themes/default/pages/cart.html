@@ -8,39 +8,46 @@
 <section class="section">
     <div class="grid grid-2">
         <div class="card">
+            {{ if .Cart.HasItems }}
             <table class="table">
                 <thead>
                     <tr>
                         <th>{{ t "cart.item" }}</th>
                         <th>{{ t "cart.billing_cycle" }}</th>
+                        <th>{{ t "common.quantity" }}</th>
                         <th>{{ t "common.price" }}</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {{ range .Cart.Items }}
                     <tr>
-                        <td>VPS Essentials</td>
-                        <td>{{ t "pricing.monthly" }}</td>
-                        <td>$12.00</td>
+                        <td>{{ .ProductName }}</td>
+                        <td>{{ .BillingCycle }}</td>
+                        <td>{{ .Quantity }}</td>
+                        <td>{{ $.Cart.Currency }}{{ .Total }}</td>
                     </tr>
-                    <tr>
-                        <td>Domain Registration</td>
-                        <td>{{ t "pricing.annually" }}</td>
-                        <td>$14.00</td>
-                    </tr>
+                    {{ end }}
                 </tbody>
             </table>
+            {{ else }}
+            <p>{{ t "cart.empty" }}</p>
+            {{ end }}
         </div>
         <div class="card card-muted">
             <h3>{{ t "cart.summary" }}</h3>
             <div class="list">
-                <span>{{ t "common.subtotal" }}: $26.00</span>
-                <span>{{ t "common.tax" }}: $0.00</span>
-                <strong>{{ t "common.total" }}: $26.00</strong>
+                <span>{{ t "common.subtotal" }}: {{ .Cart.Currency }}{{ .Cart.Subtotal }}</span>
+                <span>{{ t "common.discount" }}: {{ .Cart.Currency }}{{ .Cart.Discount }}</span>
+                <span>{{ t "common.tax" }}: {{ .Cart.Currency }}{{ .Cart.Tax }}</span>
+                <strong>{{ t "common.total" }}: {{ .Cart.Currency }}{{ .Cart.Total }}</strong>
             </div>
-            <div class="field">
-                <label>{{ t "cart.promo_code" }}</label>
-                <input class="input" type="text" placeholder="OPENHOST" />
-            </div>
+            <form class="form" method="post" action="/cart/coupon">
+                <div class="field">
+                    <label>{{ t "cart.promo_code" }}</label>
+                    <input class="input" type="text" name="coupon" value="{{ .Cart.CouponCode }}" placeholder="OPENHOST" />
+                </div>
+                <button class="button button-outline" type="submit">{{ t "cart.apply" }}</button>
+            </form>
             <a class="button button-primary" href="/checkout">{{ t "cart.checkout" }}</a>
         </div>
     </div>

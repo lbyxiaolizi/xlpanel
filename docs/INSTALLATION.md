@@ -28,6 +28,17 @@ Open your browser at:
 http://localhost:6421/install
 ```
 
+## Web quickstart
+
+After installation, you can use the web UI to register, login, and place orders:
+
+- Register: `http://localhost:6421/register`
+- Login: `http://localhost:6421/login`
+- Browse products: `http://localhost:6421/products`
+- Cart/checkout: `http://localhost:6421/cart` and `http://localhost:6421/checkout`
+
+If the product catalog is empty, the server seeds a default product and pricing so you can place a test order.
+
 ## Web installer steps
 
 1. **Site Settings**: Set the site name and base URL.
@@ -41,6 +52,11 @@ After submission, the installer will:
 - Create the database (or connect to PostgreSQL).
 - Run GORM migrations for the core domain tables.
 - Write configuration to `config/openhost.json`.
+
+When the server starts with a saved config, it will:
+
+- Ensure database migrations are up to date.
+- Create or update the configured administrator account so it always has admin access.
 
 ## Reinstalling
 

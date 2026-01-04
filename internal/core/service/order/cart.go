@@ -1,18 +1,23 @@
 package order
 
 import (
+	"encoding/json"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 
 	"github.com/openhost/openhost/internal/core/domain"
+	"github.com/openhost/openhost/internal/core/service/tax"
 )
 
 var (
-	ErrCartNotFound    = errors.New("cart not found")
-	ErrCartItemNotFound = errors.New("cart item not found")
+	ErrCartNotFound        = errors.New("cart not found")
+	ErrCartItemNotFound    = errors.New("cart item not found")
+	ErrPricingNotFound     = errors.New("product pricing not found")
+	ErrInvalidBillingCycle = errors.New("billing cycle not available")
 )
 
 const CartExpiration = 7 * 24 * time.Hour // 7 days
@@ -79,16 +84,38 @@ func (s *CartService) AddItem(cartID, productID uint64, quantity int, billingCyc
 		quantity = 1
 	}
 
-	// Get product with pricing
+	if billingCycle == "" {
+		billingCycle = "monthly"
+	}
+
+	var cart domain.Cart
+	if err := s.db.First(&cart, cartID).Error; err != nil {
+		return nil, ErrCartNotFound
+	}
+
+	// Get product with config options
 	var product domain.Product
-	if err := s.db.First(&product, productID).Error; err != nil {
+	if err := s.db.Preload("ConfigGroups.Options.SubOptions").First(&product, productID).Error; err != nil {
 		return nil, ErrProductNotFound
 	}
 
-	// Get pricing for the selected billing cycle
-	// TODO: Get pricing from ConfigSubOption based on configOptions
-	setupFee := decimal.NewFromFloat(0)
-	recurringFee := decimal.NewFromFloat(29.99) // Default pricing
+	var pricing domain.ProductPricing
+	if err := s.db.Where("product_id = ? AND currency = ?", productID, cart.Currency).First(&pricing).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrPricingNotFound
+		}
+		return nil, err
+	}
+
+	recurringFee := pricing.GetPrice(billingCycle)
+	if !pricing.IsCycleEnabled(billingCycle) {
+		return nil, ErrInvalidBillingCycle
+	}
+
+	setupFee := pricing.SetupFee
+	optionSetupFee, optionRecurring := calculateConfigOptionPricing(product, billingCycle, configOptions)
+	setupFee = setupFee.Add(optionSetupFee)
+	recurringFee = recurringFee.Add(optionRecurring)
 
 	// Check if item already exists in cart
 	var existingItem domain.CartItem
@@ -252,8 +279,17 @@ func (s *CartService) GetCartSummary(cartID uint64) (*CartSummary, error) {
 		})
 		summary.Subtotal = summary.Subtotal.Add(item.SetupFee.Add(item.RecurringFee.Mul(decimal.NewFromInt(int64(item.Quantity)))))
 		summary.TotalDiscount = summary.TotalDiscount.Add(item.Discount)
-		summary.Total = summary.Total.Add(item.Total)
 	}
+
+	taxableAmount := summary.Subtotal.Sub(summary.TotalDiscount)
+	if cart.CustomerID != nil && taxableAmount.GreaterThan(decimal.Zero) {
+		taxAmount, err := tax.NewCalculator(s.db).CalculateForCustomer(*cart.CustomerID, taxableAmount)
+		if err != nil {
+			return nil, err
+		}
+		summary.Tax = taxAmount
+	}
+	summary.Total = taxableAmount.Add(summary.Tax)
 
 	if cart.Coupon != nil {
 		summary.CouponCode = cart.Coupon.Code
@@ -307,6 +343,101 @@ func (s *CartService) CleanupExpiredCarts() error {
 	}
 
 	return nil
+}
+
+func calculateConfigOptionPricing(product domain.Product, billingCycle string, configOptions domain.JSONMap) (decimal.Decimal, decimal.Decimal) {
+	optionSetup := decimal.Zero
+	optionRecurring := decimal.Zero
+	if len(configOptions) == 0 {
+		return optionSetup, optionRecurring
+	}
+
+	selectedOptions := map[uint64]uint64{}
+	for key, value := range configOptions {
+		optionID, ok := parseUint64(key)
+		if !ok {
+			continue
+		}
+		subOptionID, ok := parseJSONNumber(value)
+		if !ok {
+			continue
+		}
+		selectedOptions[optionID] = subOptionID
+	}
+
+	for _, group := range product.ConfigGroups {
+		for _, option := range group.Options {
+			subOptionID, ok := selectedOptions[option.ID]
+			if !ok {
+				continue
+			}
+			for _, subOption := range option.SubOptions {
+				if subOption.ID != subOptionID {
+					continue
+				}
+				optionSetup = optionSetup.Add(subOption.Pricing.SetupFee)
+				optionRecurring = optionRecurring.Add(priceForCycle(subOption.Pricing, billingCycle))
+			}
+		}
+	}
+
+	return optionSetup, optionRecurring
+}
+
+func priceForCycle(pricing domain.Pricing, billingCycle string) decimal.Decimal {
+	switch billingCycle {
+	case "quarterly":
+		return pricing.Quarterly
+	case "annually", "yearly":
+		return pricing.Yearly
+	case "triennially":
+		return pricing.Triennially
+	default:
+		return pricing.Monthly
+	}
+}
+
+func parseUint64(value string) (uint64, bool) {
+	parsed, err := strconv.ParseUint(value, 10, 64)
+	if err != nil {
+		return 0, false
+	}
+	return parsed, true
+}
+
+func parseJSONNumber(value any) (uint64, bool) {
+	switch typed := value.(type) {
+	case float64:
+		return uint64(typed), true
+	case float32:
+		return uint64(typed), true
+	case int:
+		return uint64(typed), true
+	case int32:
+		return uint64(typed), true
+	case int64:
+		return uint64(typed), true
+	case uint:
+		return uint64(typed), true
+	case uint32:
+		return uint64(typed), true
+	case uint64:
+		return typed, true
+	case json.Number:
+		parsed, err := typed.Int64()
+		if err != nil {
+			return 0, false
+		}
+		return uint64(parsed), true
+	case string:
+		parsed, err := strconv.ParseUint(typed, 10, 64)
+		if err != nil {
+			return 0, false
+		}
+		return parsed, true
+	default:
+		return 0, false
+	}
 }
 
 // CartSummary represents a summary of cart contents

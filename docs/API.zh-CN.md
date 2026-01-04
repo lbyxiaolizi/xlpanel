@@ -34,8 +34,23 @@ curl -X POST https://api.yourdomain.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "secret"}'
 
-# 响应包含会话 cookie
+# 响应包含会话 token
 ```
+
+服务会返回 `token` 字段。请使用 `Authorization: Bearer <token>` 访问需要登录的接口。
+
+### 购物车会话
+
+未登录用户可以通过 `X-Session-ID` 头创建/读取购物车：
+
+```bash
+curl -X POST https://api.yourdomain.com/api/v1/cart/items \
+  -H "Content-Type: application/json" \
+  -H "X-Session-ID: guest-session-123" \
+  -d '{"product_id": 1, "quantity": 1, "billing_cycle": "monthly"}'
+```
+
+登录后可直接请求 `/api/v1/cart` 获取用户购物车，无需传递 `X-Session-ID`。
 
 ## 响应格式
 

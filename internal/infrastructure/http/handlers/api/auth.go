@@ -379,6 +379,8 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		}
 
 		SetCurrentUser(c, user)
+		c.Set("customer_id", user.ID)
+		c.Set("user_id", user.ID)
 		c.Next()
 	}
 }
@@ -391,6 +393,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, ErrorResponse{Error: "Admin access required"})
 			return
 		}
+		c.Set("admin_id", user.ID)
 		c.Next()
 	}
 }

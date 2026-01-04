@@ -9,19 +9,30 @@
     <div class="grid grid-2">
         <div class="card">
             <h3>{{ t "checkout.billing_info" }}</h3>
-            <form class="form">
+            <form class="form" method="post" action="/checkout">
                 <div class="field">
                     <label>{{ t "common.name" }}</label>
-                    <input class="input" type="text" placeholder="Alex Chen" />
+                    <input class="input" type="text" name="name" value="{{ .User.FirstName }} {{ .User.LastName }}" />
                 </div>
                 <div class="field">
                     <label>{{ t "auth.login.email" }}</label>
-                    <input class="input" type="email" placeholder="you@example.com" />
+                    <input class="input" type="email" name="email" value="{{ .User.Email }}" />
                 </div>
                 <div class="field">
                     <label>{{ t "client.profile.fields.address1" }}</label>
-                    <input class="input" type="text" placeholder="123 Cloud Ave" />
+                    <input class="input" type="text" name="address1" value="{{ .User.Address1 }}" />
                 </div>
+                <div class="list">
+                    <span>{{ t "common.subtotal" }}: {{ .Cart.Currency }}{{ .Cart.Subtotal }}</span>
+                    <span>{{ t "common.discount" }}: {{ .Cart.Currency }}{{ .Cart.Discount }}</span>
+                    <span>{{ t "common.tax" }}: {{ .Cart.Currency }}{{ .Cart.Tax }}</span>
+                    <strong>{{ t "common.total" }}: {{ .Cart.Currency }}{{ .Cart.Total }}</strong>
+                </div>
+                <label>
+                    <input type="checkbox" name="agree_terms" required />
+                    {{ t "checkout.agree_terms" }}
+                </label>
+                <button class="button button-primary" type="submit">{{ t "checkout.place_order" }}</button>
             </form>
         </div>
         <div class="card card-muted">
@@ -31,10 +42,6 @@
                 <label><input type="radio" name="payment" /> PayPal</label>
                 <label><input type="radio" name="payment" /> Bank Transfer</label>
             </div>
-            <label>
-                <input type="checkbox" /> {{ t "checkout.agree_terms" }}
-            </label>
-            <button class="button button-primary" type="submit">{{ t "checkout.place_order" }}</button>
         </div>
     </div>
 </section>

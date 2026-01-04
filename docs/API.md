@@ -34,8 +34,23 @@ curl -X POST https://api.yourdomain.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "secret"}'
 
-# Response includes session cookie
+# Response includes a session token
 ```
+
+The response includes a `token`. Use `Authorization: Bearer <token>` for authenticated requests.
+
+### Cart Sessions
+
+Guest carts are supported via the `X-Session-ID` header:
+
+```bash
+curl -X POST https://api.yourdomain.com/api/v1/cart/items \
+  -H "Content-Type: application/json" \
+  -H "X-Session-ID: guest-session-123" \
+  -d '{"product_id": 1, "quantity": 1, "billing_cycle": "monthly"}'
+```
+
+When logged in, omit `X-Session-ID` to access the user cart.
 
 ## Response Format
 
