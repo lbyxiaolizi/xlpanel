@@ -1,0 +1,27 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "admin.services.title" }}</h1>
+    <p>{{ t "home.features.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>{{ t "client.services.details.product" }}</th>
+                    <th>{{ t "client.services.details.domain" }}</th>
+                    <th>{{ t "common.status" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Managed Hosting</td>
+                    <td>store.openhost.dev</td>
+                    <td>{{ t "client.services.status.active" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ end }}

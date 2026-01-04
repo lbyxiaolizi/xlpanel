@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ .Description }}">
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}{{ t "common.app_name" }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/{{ .Theme }}/assets/images/favicon.svg">
+    <link rel="stylesheet" href="/static/{{ .Theme }}/assets/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="/admin">
+                <span class="brand-mark">OH</span>
+                <span>{{ t "nav.admin_panel" }}</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link {{ if eq .Section "dashboard" }}is-active{{ end }}" href="/admin">{{ t "admin.dashboard.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "customers" }}is-active{{ end }}" href="/admin/customers">{{ t "admin.customers.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "orders" }}is-active{{ end }}" href="/admin/orders">{{ t "admin.orders.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "services" }}is-active{{ end }}" href="/admin/services">{{ t "admin.services.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "invoices" }}is-active{{ end }}" href="/admin/invoices">{{ t "admin.invoices.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "tickets" }}is-active{{ end }}" href="/admin/tickets">{{ t "admin.tickets.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "products" }}is-active{{ end }}" href="/admin/products">{{ t "admin.products.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "servers" }}is-active{{ end }}" href="/admin/servers">{{ t "admin.servers.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "settings" }}is-active{{ end }}" href="/admin/settings">{{ t "admin.settings.title" }}</a>
+            </nav>
+            <div class="card card-muted">
+                <div class="badge">{{ t "common.status" }}</div>
+                <p>{{ t "home.features.subtitle" }}</p>
+                <a class="button button-primary" href="/">{{ t "nav.home" }}</a>
+            </div>
+        </aside>
+        <div class="app-main">
+            <div class="app-topbar">
+                <button class="icon-button mobile-only" data-sidebar-toggle aria-label="Toggle sidebar">☰</button>
+                <div>
+                    <strong>{{ t "common.app_name" }}</strong>
+                </div>
+                <div class="nav-actions">
+                    <button class="icon-button" data-theme-toggle aria-label="Toggle theme">◐</button>
+                    <a class="button button-outline" href="/client">{{ t "nav.client_area" }}</a>
+                </div>
+            </div>
+            <main class="app-content">
+                {{ if .Flash }}
+                <div class="alert alert-{{ .Flash.Type }}">{{ .Flash.Message }}</div>
+                {{ end }}
+                {{ template "content" . }}
+            </main>
+        </div>
+    </div>
+    <script src="/static/{{ .Theme }}/assets/js/main.js"></script>
+</body>
+</html>

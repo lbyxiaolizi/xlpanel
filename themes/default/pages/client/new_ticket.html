@@ -1,0 +1,30 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "client.tickets.new_ticket" }}</h1>
+    <p>{{ t "client.tickets.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="card">
+        <form class="form">
+            <div class="field">
+                <label>{{ t "client.tickets.subject" }}</label>
+                <input class="input" type="text" placeholder="Billing question" />
+            </div>
+            <div class="field">
+                <label>{{ t "client.tickets.department" }}</label>
+                <select class="select">
+                    <option>Billing</option>
+                    <option>Support</option>
+                    <option>Sales</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>{{ t "common.description" }}</label>
+                <textarea class="textarea" rows="5" placeholder="Describe your issue..."></textarea>
+            </div>
+            <button class="button button-primary" type="submit">{{ t "common.submit" }}</button>
+        </form>
+    </div>
+</section>
+{{ end }}

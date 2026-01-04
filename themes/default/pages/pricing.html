@@ -1,519 +1,66 @@
 {{ define "content" }}
-<section class="pricing-page">
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header text-center">
-            <h1>Simple, Transparent Pricing</h1>
-            <p>Choose the plan that fits your needs. No hidden fees.</p>
+<section class="page-header">
+    <span class="badge">{{ t "nav.pricing" }}</span>
+    <h1>{{ t "pricing.title" }}</h1>
+    <p>{{ t "pricing.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-3">
+        <div class="card">
+            <h3>Starter</h3>
+            <p>{{ t "pricing.monthly" }}</p>
+            <h2>$12<span class="badge">{{ t "pricing.save" 10 }}</span></h2>
+            <div class="list">
+                <span>1 vCPU · 2GB RAM</span>
+                <span>NVMe Storage</span>
+                <span>Email Support</span>
+            </div>
+            <a class="button button-primary" href="/cart">{{ t "products.order_now" }}</a>
         </div>
-
-        <!-- Billing Toggle -->
-        <div class="billing-toggle text-center">
-            <span class="toggle-label" data-cycle="monthly">Monthly</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="billingToggle">
-                <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label" data-cycle="annually">
-                Annually <span class="discount-badge">Save 20%</span>
-            </span>
+        <div class="card card-muted">
+            <h3>{{ t "pricing.most_popular" }}</h3>
+            <p>{{ t "pricing.annually" }}</p>
+            <h2>$29</h2>
+            <div class="list">
+                <span>4 vCPU · 8GB RAM</span>
+                <span>Global CDN</span>
+                <span>Priority Support</span>
+            </div>
+            <a class="button button-primary" href="/cart">{{ t "products.order_now" }}</a>
         </div>
-
-        <!-- Pricing Cards -->
-        <div class="grid grid-3 pricing-grid">
-            <!-- Starter Plan -->
-            <div class="card pricing-card">
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Starter</h3>
-                    <p class="pricing-description">Perfect for small projects and personal use</p>
-                </div>
-                <div class="pricing-price">
-                    <span class="currency">$</span>
-                    <span class="amount" data-monthly="9" data-annually="7">9</span>
-                    <span class="period">/month</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        1 Website
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        10 GB Storage
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        100 GB Bandwidth
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Free SSL Certificate
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Email Support
-                    </li>
-                </ul>
-                <a href="/register?plan=starter" class="btn btn-outline btn-block">Get Started</a>
+        <div class="card">
+            <h3>{{ t "pricing.enterprise" }}</h3>
+            <p>{{ t "pricing.biennially" }}</p>
+            <h2>$99</h2>
+            <div class="list">
+                <span>Dedicated Cluster</span>
+                <span>Custom SLA</span>
+                <span>Dedicated CSM</span>
             </div>
-
-            <!-- Professional Plan -->
-            <div class="card pricing-card featured">
-                <div class="pricing-badge">Most Popular</div>
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Professional</h3>
-                    <p class="pricing-description">For growing businesses and teams</p>
-                </div>
-                <div class="pricing-price">
-                    <span class="currency">$</span>
-                    <span class="amount" data-monthly="29" data-annually="23">29</span>
-                    <span class="period">/month</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        10 Websites
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        50 GB Storage
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Unlimited Bandwidth
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Free SSL Certificate
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Priority Support
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Daily Backups
-                    </li>
-                </ul>
-                <a href="/register?plan=professional" class="btn btn-primary btn-block">Get Started</a>
-            </div>
-
-            <!-- Enterprise Plan -->
-            <div class="card pricing-card">
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Enterprise</h3>
-                    <p class="pricing-description">For large organizations and high traffic sites</p>
-                </div>
-                <div class="pricing-price">
-                    <span class="currency">$</span>
-                    <span class="amount" data-monthly="99" data-annually="79">99</span>
-                    <span class="period">/month</span>
-                </div>
-                <ul class="pricing-features">
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Unlimited Websites
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        200 GB Storage
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Unlimited Bandwidth
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Premium SSL Certificate
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        24/7 Phone Support
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Real-time Backups
-                    </li>
-                    <li>
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Dedicated Resources
-                    </li>
-                </ul>
-                <a href="/register?plan=enterprise" class="btn btn-outline btn-block">Get Started</a>
-            </div>
-        </div>
-
-        <!-- FAQ Section -->
-        <div class="faq-section">
-            <h2 class="text-center mb-4">Frequently Asked Questions</h2>
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h4>Can I switch plans at any time?</h4>
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll only pay the prorated difference. When downgrading, the remaining credit will be applied to your next billing cycle.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h4>Is there a free trial?</h4>
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes! We offer a 14-day free trial on all plans. No credit card required to start. You'll have full access to all features during the trial period.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h4>What payment methods do you accept?</h4>
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for annual plans. Enterprise customers can also pay via invoice.</p>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h4>Do you offer refunds?</h4>
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, we offer a 30-day money-back guarantee on all plans. If you're not satisfied with our service, contact support within 30 days of purchase for a full refund.</p>
-                    </div>
-                </div>
-            </div>
+            <a class="button button-outline" href="/contact">{{ t "pricing.contact_sales" }}</a>
         </div>
     </div>
 </section>
 
-<style>
-.pricing-page {
-    padding: 3rem 0;
-}
-
-.page-header {
-    margin-bottom: 3rem;
-}
-
-.page-header h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.page-header p {
-    font-size: 1.25rem;
-    color: var(--text-tertiary);
-}
-
-.billing-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 3rem;
-}
-
-.toggle-label {
-    font-weight: 500;
-    color: var(--text-tertiary);
-    cursor: pointer;
-}
-
-.toggle-label.active {
-    color: var(--primary);
-}
-
-.discount-badge {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.toggle-switch {
-    position: relative;
-    width: 60px;
-    height: 30px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--border);
-    border-radius: 30px;
-    transition: var(--transition);
-}
-
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    border-radius: 50%;
-    transition: var(--transition);
-}
-
-.toggle-switch input:checked + .toggle-slider {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(30px);
-}
-
-.pricing-grid {
-    margin-bottom: 4rem;
-}
-
-.pricing-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-}
-
-.pricing-card.featured {
-    border: 2px solid var(--primary);
-    transform: scale(1.05);
-}
-
-.pricing-badge {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    padding: 0.25rem 1rem;
-    border-radius: var(--radius-md);
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.pricing-header {
-    margin-bottom: 1.5rem;
-}
-
-.pricing-name {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.pricing-description {
-    color: var(--text-tertiary);
-    font-size: 0.875rem;
-    margin-bottom: 0;
-}
-
-.pricing-price {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 0.25rem;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-}
-
-.pricing-price .currency {
-    font-size: 1.5rem;
-    color: var(--text-tertiary);
-}
-
-.pricing-price .amount {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.pricing-price .period {
-    color: var(--text-tertiary);
-}
-
-.pricing-features {
-    list-style: none;
-    text-align: left;
-    margin-bottom: 1.5rem;
-    flex: 1;
-}
-
-.pricing-features li {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.pricing-features svg {
-    color: var(--success);
-    flex-shrink: 0;
-}
-
-.btn-block {
-    width: 100%;
-}
-
-.faq-section {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.faq-list {
-    margin-top: 2rem;
-}
-
-.faq-item {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    cursor: pointer;
-    background: var(--bg-primary);
-    transition: var(--transition);
-}
-
-.faq-question:hover {
-    background: var(--bg-secondary);
-}
-
-.faq-question h4 {
-    margin: 0;
-    font-size: 1.125rem;
-}
-
-.faq-toggle {
-    font-size: 1.5rem;
-    font-weight: 300;
-    transition: var(--transition);
-}
-
-.faq-item.active .faq-toggle {
-    transform: rotate(45deg);
-}
-
-.faq-answer {
-    display: none;
-    padding: 0 1.5rem 1.5rem;
-    color: var(--text-secondary);
-}
-
-.faq-item.active .faq-answer {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .page-header h1 {
-        font-size: 2rem;
-    }
-    
-    .pricing-card.featured {
-        transform: none;
-    }
-    
-    .billing-toggle {
-        flex-wrap: wrap;
-    }
-}
-</style>
-
-<script>
-// FAQ Toggle
-document.querySelectorAll('.faq-question').forEach(question => {
-    question.addEventListener('click', () => {
-        const item = question.parentElement;
-        item.classList.toggle('active');
-    });
-});
-
-// Billing Toggle
-const billingToggle = document.getElementById('billingToggle');
-const amounts = document.querySelectorAll('.pricing-price .amount');
-const toggleLabels = document.querySelectorAll('.toggle-label');
-
-if (billingToggle) {
-    billingToggle.addEventListener('change', () => {
-        const cycle = billingToggle.checked ? 'annually' : 'monthly';
-        
-        amounts.forEach(amount => {
-            amount.textContent = amount.dataset[cycle];
-        });
-        
-        toggleLabels.forEach(label => {
-            if (label.dataset.cycle === cycle) {
-                label.classList.add('active');
-            } else {
-                label.classList.remove('active');
-            }
-        });
-    });
-    
-    // Set initial state
-    toggleLabels[0].classList.add('active');
-}
-</script>
+<section class="section">
+    <div class="card">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">{{ t "pricing.faq_title" }}</h2>
+                <p class="section-subtitle">{{ t "home.cta.subtitle" }}</p>
+            </div>
+        </div>
+        <div class="grid grid-2">
+            <div class="card card-muted">
+                <h4>{{ t "pricing.billing_cycle" }}</h4>
+                <p>{{ t "pricing.subtitle" }}</p>
+            </div>
+            <div class="card card-muted">
+                <h4>{{ t "pricing.contact_sales" }}</h4>
+                <p>{{ t "nav.support" }}</p>
+            </div>
+        </div>
+    </div>
+</section>
 {{ end }}

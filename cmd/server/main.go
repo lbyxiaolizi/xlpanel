@@ -18,7 +18,7 @@ func main() {
 	router.Use(gin.Recovery())
 
 	// Static files
-	router.Static("/static", "./themes/default/assets")
+	router.Static("/static", "./themes")
 
 	// Frontend routes
 	router.GET("/", handlers.Root)
@@ -37,7 +37,7 @@ func main() {
 	router.GET("/contact", handlers.Contact)
 	router.GET("/docs", handlers.Docs)
 	router.GET("/support", handlers.Support)
-	
+
 	// User panel routes
 	router.GET("/client", handlers.ClientDashboard)
 	router.GET("/client/services", handlers.ClientServices)
@@ -52,7 +52,7 @@ func main() {
 	router.GET("/client/domains", handlers.ClientDomains)
 	router.GET("/client/subusers", handlers.ClientSubUsers)
 	router.GET("/client/security", handlers.ClientSecurity)
-	
+
 	// Admin panel routes
 	router.GET("/admin", handlers.AdminDashboard)
 	router.GET("/admin/customers", handlers.AdminCustomers)
@@ -63,7 +63,7 @@ func main() {
 	router.GET("/admin/products", handlers.AdminProducts)
 	router.GET("/admin/servers", handlers.AdminServers)
 	router.GET("/admin/settings", handlers.AdminSettings)
-	
+
 	// Shopping cart routes
 	router.GET("/cart", handlers.Cart)
 	router.GET("/checkout", handlers.Checkout)

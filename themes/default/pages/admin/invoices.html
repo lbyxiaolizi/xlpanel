@@ -1,0 +1,27 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "admin.invoices.title" }}</h1>
+    <p>{{ t "home.features.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>{{ t "client.invoices.invoice_number" }}</th>
+                    <th>{{ t "common.amount" }}</th>
+                    <th>{{ t "common.status" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#1249</td>
+                    <td>$29.00</td>
+                    <td>{{ t "client.invoices.status.unpaid" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ end }}

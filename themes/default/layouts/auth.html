@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ .Description }}">
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}{{ t "common.app_name" }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/{{ .Theme }}/assets/images/favicon.svg">
+    <link rel="stylesheet" href="/static/{{ .Theme }}/assets/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-shell">
+        <div class="auth-card">
+            <div class="page-header">
+                <a class="brand" href="/">
+                    <span class="brand-mark">OH</span>
+                    <span>{{ t "common.app_name" }}</span>
+                </a>
+            </div>
+            {{ if .Flash }}
+            <div class="alert alert-{{ .Flash.Type }}">{{ .Flash.Message }}</div>
+            {{ end }}
+            {{ template "content" . }}
+        </div>
+    </div>
+    <script src="/static/{{ .Theme }}/assets/js/main.js"></script>
+</body>
+</html>

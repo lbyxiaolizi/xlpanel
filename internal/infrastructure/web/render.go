@@ -79,16 +79,16 @@ type RenderOptions struct {
 
 // Renderer handles template rendering with theme and i18n support
 type Renderer struct {
-	mu           sync.RWMutex
-	theme        string
-	basePath     string
-	providers    []HookProvider
-	i18nManager  *i18n.Manager
-	themeManager *ThemeManager
-	siteConfig   *SiteConfig
+	mu            sync.RWMutex
+	theme         string
+	basePath      string
+	providers     []HookProvider
+	i18nManager   *i18n.Manager
+	themeManager  *ThemeManager
+	siteConfig    *SiteConfig
 	templateCache map[string]*template.Template
-	cacheEnabled bool
-	funcMap      template.FuncMap
+	cacheEnabled  bool
+	funcMap       template.FuncMap
 }
 
 // defaultRenderer is the global default renderer instance
@@ -155,18 +155,18 @@ func (r *Renderer) initFuncMap() {
 		"mod": templateMod,
 
 		// String manipulation
-		"lower":      strings.ToLower,
-		"upper":      strings.ToUpper,
-		"title":      strings.Title,
-		"trim":       strings.TrimSpace,
-		"replace":    strings.ReplaceAll,
-		"contains":   strings.Contains,
-		"hasPrefix":  strings.HasPrefix,
-		"hasSuffix":  strings.HasSuffix,
-		"split":      strings.Split,
-		"join":       strings.Join,
-		"truncate":   templateTruncate,
-		"pluralize":  templatePluralize,
+		"lower":     strings.ToLower,
+		"upper":     strings.ToUpper,
+		"title":     strings.Title,
+		"trim":      strings.TrimSpace,
+		"replace":   strings.ReplaceAll,
+		"contains":  strings.Contains,
+		"hasPrefix": strings.HasPrefix,
+		"hasSuffix": strings.HasSuffix,
+		"split":     strings.Split,
+		"join":      strings.Join,
+		"truncate":  templateTruncate,
+		"pluralize": templatePluralize,
 
 		// Date/Time formatting
 		"formatDate":     templateFormatDate,
@@ -187,18 +187,18 @@ func (r *Renderer) initFuncMap() {
 		"ternary":  templateTernary,
 
 		// Collection helpers
-		"first":    templateFirst,
-		"last":     templateLast,
-		"slice":    templateSlice,
-		"len":      templateLen,
-		"reverse":  templateReverse,
-		"sortBy":   templateSortBy,
-		"groupBy":  templateGroupBy,
-		"pluck":    templatePluck,
-		"unique":   templateUnique,
-		"in":       templateIn,
-		"notIn":    templateNotIn,
-		"range":    templateRange,
+		"first":   templateFirst,
+		"last":    templateLast,
+		"slice":   templateSlice,
+		"len":     templateLen,
+		"reverse": templateReverse,
+		"sortBy":  templateSortBy,
+		"groupBy": templateGroupBy,
+		"pluck":   templatePluck,
+		"unique":  templateUnique,
+		"in":      templateIn,
+		"notIn":   templateNotIn,
+		"range":   templateRange,
 
 		// URL helpers
 		"asset":       r.assetURL,
@@ -298,6 +298,10 @@ func (r *Renderer) RenderWithOptions(c *gin.Context, templateName string, data g
 		data = gin.H{}
 	}
 
+	if opts.Layout == "" {
+		opts.Layout = r.inferLayout(templateName)
+	}
+
 	// Set status code
 	statusCode := opts.StatusCode
 	if statusCode == 0 {
@@ -361,6 +365,19 @@ func (r *Renderer) RenderWithOptions(c *gin.Context, templateName string, data g
 		Name:     execName,
 		Data:     data,
 	})
+}
+
+func (r *Renderer) inferLayout(templateName string) string {
+	switch {
+	case strings.HasPrefix(templateName, "admin/"):
+		return LayoutAdmin
+	case strings.HasPrefix(templateName, "client/"):
+		return LayoutClient
+	case templateName == "login.html" || templateName == "register.html" || templateName == "install.html":
+		return LayoutAuth
+	default:
+		return LayoutPublic
+	}
 }
 
 // injectContextData injects common context values into the data map

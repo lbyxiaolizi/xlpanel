@@ -1,0 +1,41 @@
+{{ define "content" }}
+<section class="page-header">
+    <span class="badge">{{ t "checkout.title" }}</span>
+    <h1>{{ t "checkout.title" }}</h1>
+    <p>{{ t "checkout.review_order" }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card">
+            <h3>{{ t "checkout.billing_info" }}</h3>
+            <form class="form">
+                <div class="field">
+                    <label>{{ t "common.name" }}</label>
+                    <input class="input" type="text" placeholder="Alex Chen" />
+                </div>
+                <div class="field">
+                    <label>{{ t "auth.login.email" }}</label>
+                    <input class="input" type="email" placeholder="you@example.com" />
+                </div>
+                <div class="field">
+                    <label>{{ t "client.profile.fields.address1" }}</label>
+                    <input class="input" type="text" placeholder="123 Cloud Ave" />
+                </div>
+            </form>
+        </div>
+        <div class="card card-muted">
+            <h3>{{ t "checkout.payment_method" }}</h3>
+            <div class="list">
+                <label><input type="radio" name="payment" /> Credit Card</label>
+                <label><input type="radio" name="payment" /> PayPal</label>
+                <label><input type="radio" name="payment" /> Bank Transfer</label>
+            </div>
+            <label>
+                <input type="checkbox" /> {{ t "checkout.agree_terms" }}
+            </label>
+            <button class="button button-primary" type="submit">{{ t "checkout.place_order" }}</button>
+        </div>
+    </div>
+</section>
+{{ end }}
