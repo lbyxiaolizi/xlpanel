@@ -7,31 +7,34 @@
 
 <section class="section">
     <div class="grid grid-3">
-        <div class="card">
-            <h3>{{ t "products.categories.vps" }}</h3>
-            <p>Elastic VPS clusters with instant scaling.</p>
-            <a class="button button-outline" href="/order/configure/vps">{{ t "products.configure" }}</a>
-        </div>
-        <div class="card">
-            <h3>{{ t "products.categories.dedicated" }}</h3>
-            <p>High-performance bare metal for critical workloads.</p>
-            <a class="button button-outline" href="/order/configure/dedicated">{{ t "products.configure" }}</a>
-        </div>
-        <div class="card">
-            <h3>{{ t "products.categories.shared" }}</h3>
-            <p>Managed shared hosting with premium support.</p>
-            <a class="button button-outline" href="/order/configure/shared">{{ t "products.configure" }}</a>
-        </div>
-        <div class="card">
-            <h3>{{ t "products.categories.reseller" }}</h3>
-            <p>Launch your own hosting brand in minutes.</p>
-            <a class="button button-outline" href="/order/configure/reseller">{{ t "products.configure" }}</a>
-        </div>
-        <div class="card">
-            <h3>{{ t "products.categories.domain" }}</h3>
-            <p>Search, register, and protect domains globally.</p>
-            <a class="button button-outline" href="/order/configure/domain">{{ t "products.configure" }}</a>
-        </div>
+        {{ if .Products }}
+            {{ range .Products }}
+            <div class="card">
+                <h3>{{ .Name }}</h3>
+                <p>{{ .Description }}</p>
+                {{ if .Price }}
+                <p><strong>{{ .Currency }}{{ .Price }}</strong> / {{ .BillingCycle }}</p>
+                {{ end }}
+                <a class="button button-outline" href="/order/configure/{{ .Slug }}">{{ t "products.configure" }}</a>
+            </div>
+            {{ end }}
+        {{ else }}
+            <div class="card">
+                <h3>{{ t "products.categories.vps" }}</h3>
+                <p>Elastic VPS clusters with instant scaling.</p>
+                <a class="button button-outline" href="/order/configure/vps">{{ t "products.configure" }}</a>
+            </div>
+            <div class="card">
+                <h3>{{ t "products.categories.dedicated" }}</h3>
+                <p>High-performance bare metal for critical workloads.</p>
+                <a class="button button-outline" href="/order/configure/dedicated">{{ t "products.configure" }}</a>
+            </div>
+            <div class="card">
+                <h3>{{ t "products.categories.shared" }}</h3>
+                <p>Managed shared hosting with premium support.</p>
+                <a class="button button-outline" href="/order/configure/shared">{{ t "products.configure" }}</a>
+            </div>
+        {{ end }}
     </div>
 </section>
 {{ end }}

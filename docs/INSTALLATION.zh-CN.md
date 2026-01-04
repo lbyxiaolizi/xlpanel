@@ -28,6 +28,17 @@ make server
 http://localhost:6421/install
 ```
 
+## Web 快速体验
+
+安装完成后可通过网页完成注册、登录和下单：
+
+- 注册：`http://localhost:6421/register`
+- 登录：`http://localhost:6421/login`
+- 浏览产品：`http://localhost:6421/products`
+- 购物车与结账：`http://localhost:6421/cart`、`http://localhost:6421/checkout`
+
+如果产品库为空，服务会自动创建一条默认产品与价格，用于快速体验下单流程。
+
 ## 安装向导步骤
 
 1. **站点设置**：填写站点名称与基础地址。
@@ -41,6 +52,11 @@ http://localhost:6421/install
 - 创建 SQLite 数据库文件或连接 PostgreSQL。
 - 运行核心领域表的 GORM 自动迁移。
 - 写入配置文件 `config/openhost.json`。
+
+启动服务后，系统会读取 `config/openhost.json` 并自动：
+
+- 校验并补全数据库迁移。
+- 使用配置中的管理员账号自动创建/更新管理员用户（首次安装时会创建，后续启动会确保权限正确）。
 
 ## 重新安装
 

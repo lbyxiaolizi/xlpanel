@@ -26,6 +26,19 @@ func NewService(db *gorm.DB) *Service {
 	return &Service{db: db}
 }
 
+// GetPricing returns the pricing record for a product/currency pair.
+func (s *Service) GetPricing(productID uint64, currency string) (*domain.ProductPricing, error) {
+	if currency == "" {
+		currency = "USD"
+	}
+
+	var pricing domain.ProductPricing
+	if err := s.db.Where("product_id = ? AND currency = ?", productID, currency).First(&pricing).Error; err != nil {
+		return nil, err
+	}
+	return &pricing, nil
+}
+
 // CreateProductGroup creates a new product group
 func (s *Service) CreateProductGroup(name, slug, description string, sortOrder int, active bool) (*domain.ProductGroup, error) {
 	// Check if slug already exists

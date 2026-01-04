@@ -96,3 +96,18 @@ func Save(path string, cfg Config) error {
 	}
 	return nil
 }
+
+func Load(path string) (Config, error) {
+	if path == "" {
+		path = DefaultPath
+	}
+	payload, err := os.ReadFile(path)
+	if err != nil {
+		return Config{}, err
+	}
+	var cfg Config
+	if err := json.Unmarshal(payload, &cfg); err != nil {
+		return Config{}, fmt.Errorf("unmarshal config: %w", err)
+	}
+	return cfg, nil
+}

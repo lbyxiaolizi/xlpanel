@@ -275,6 +275,14 @@ func (h *OrderHandler) AddToCart(c *gin.Context) {
 
 	item, err := h.cartService.AddItem(cart.ID, req.ProductID, req.Quantity, req.BillingCycle, req.Domain, req.Hostname, req.ConfigOptions)
 	if err != nil {
+		switch err {
+		case order.ErrPricingNotFound:
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Pricing not configured for this product"})
+			return
+		case order.ErrInvalidBillingCycle:
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Billing cycle not available"})
+			return
+		}
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
@@ -668,16 +676,16 @@ func toOrderDetailResponse(o *domain.Order) OrderDetailResponse {
 
 func toServiceResponse(s *domain.Service) ServiceResponse {
 	return ServiceResponse{
-		ID:            s.ID,
-		ProductID:     s.ProductID,
-		ProductName:   s.Product.Name,
-		Status:        string(s.Status),
-		Domain:        s.Domain,
-		Hostname:      s.Hostname,
-		BillingCycle:  s.BillingCycle,
-		NextDueDate:   s.NextDueDate.Format("2006-01-02"),
+		ID:              s.ID,
+		ProductID:       s.ProductID,
+		ProductName:     s.Product.Name,
+		Status:          string(s.Status),
+		Domain:          s.Domain,
+		Hostname:        s.Hostname,
+		BillingCycle:    s.BillingCycle,
+		NextDueDate:     s.NextDueDate.Format("2006-01-02"),
 		RecurringAmount: s.RecurringAmount.String(),
-		Currency:      s.Currency,
+		Currency:        s.Currency,
 	}
 }
 
@@ -839,12 +847,12 @@ type CartItemResponse struct {
 }
 
 type AddToCartRequest struct {
-	ProductID     uint64          `json:"product_id" binding:"required"`
-	Quantity      int             `json:"quantity"`
-	BillingCycle  string          `json:"billing_cycle" binding:"required"`
-	Domain        string          `json:"domain"`
-	Hostname      string          `json:"hostname"`
-	ConfigOptions domain.JSONMap  `json:"config_options"`
+	ProductID     uint64         `json:"product_id" binding:"required"`
+	Quantity      int            `json:"quantity"`
+	BillingCycle  string         `json:"billing_cycle" binding:"required"`
+	Domain        string         `json:"domain"`
+	Hostname      string         `json:"hostname"`
+	ConfigOptions domain.JSONMap `json:"config_options"`
 }
 
 type UpdateCartItemRequest struct {

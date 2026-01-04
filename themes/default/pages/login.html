@@ -3,14 +3,14 @@
     <h1>{{ t "auth.login.title" }}</h1>
     <p>{{ t "auth.login.subtitle" }}</p>
 </div>
-<form class="form">
+<form class="form" method="post" action="/login">
     <div class="field">
         <label>{{ t "auth.login.email" }}</label>
-        <input class="input" type="email" placeholder="{{ t "auth.login.email_placeholder" }}" />
+        <input class="input" type="email" name="email" placeholder="{{ t "auth.login.email_placeholder" }}" required />
     </div>
     <div class="field">
         <label>{{ t "auth.login.password" }}</label>
-        <input class="input" type="password" placeholder="{{ t "auth.login.password_placeholder" }}" />
+        <input class="input" type="password" name="password" placeholder="{{ t "auth.login.password_placeholder" }}" required />
     </div>
     <div class="field">
         <label>

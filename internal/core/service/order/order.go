@@ -9,15 +9,16 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/openhost/openhost/internal/core/domain"
+	"github.com/openhost/openhost/internal/core/service/tax"
 )
 
 var (
-	ErrOrderNotFound    = errors.New("order not found")
-	ErrServiceNotFound  = errors.New("service not found")
-	ErrProductNotFound  = errors.New("product not found")
-	ErrInvalidQuantity  = errors.New("quantity must be greater than 0")
-	ErrCartEmpty        = errors.New("cart is empty")
-	ErrInvalidCoupon    = errors.New("invalid or expired coupon")
+	ErrOrderNotFound   = errors.New("order not found")
+	ErrServiceNotFound = errors.New("service not found")
+	ErrProductNotFound = errors.New("product not found")
+	ErrInvalidQuantity = errors.New("quantity must be greater than 0")
+	ErrCartEmpty       = errors.New("cart is empty")
+	ErrInvalidCoupon   = errors.New("invalid or expired coupon")
 )
 
 // Service provides order management operations
@@ -66,10 +67,13 @@ func (s *Service) CreateOrder(customerID uint64, cartID uint64, ipAddress string
 		})
 	}
 
-	// Calculate tax (simplified - should use tax rules)
-	taxAmount := decimal.Zero // TODO: Calculate based on TaxRule
+	taxableAmount := subtotal.Sub(discount)
+	taxAmount, err := tax.NewCalculator(s.db).CalculateForCustomer(customerID, taxableAmount)
+	if err != nil {
+		return nil, err
+	}
 
-	total := subtotal.Sub(discount).Add(taxAmount)
+	total := taxableAmount.Add(taxAmount)
 
 	// Generate order number
 	orderNumber := s.generateOrderNumber()
