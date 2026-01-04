@@ -1,0 +1,24 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "client.services.details.title" }}</h1>
+    <p>ID: {{ .ServiceID }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card">
+            <h3>{{ t "client.services.details.product" }}</h3>
+            <p>VPS Essentials</p>
+            <h3>{{ t "client.services.details.domain" }}</h3>
+            <p>demo.openhost.dev</p>
+        </div>
+        <div class="card card-muted">
+            <h3>{{ t "client.services.details.next_due" }}</h3>
+            <p>2024-08-01</p>
+            <h3>{{ t "client.services.details.billing" }}</h3>
+            <p>{{ t "pricing.monthly" }}</p>
+            <a class="button button-primary" href="/client/services">{{ t "client.services.actions.manage" }}</a>
+        </div>
+    </div>
+</section>
+{{ end }}

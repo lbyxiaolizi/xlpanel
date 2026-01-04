@@ -1,0 +1,27 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "admin.tickets.title" }}</h1>
+    <p>{{ t "home.features.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>{{ t "client.tickets.subject" }}</th>
+                    <th>{{ t "common.status" }}</th>
+                    <th>{{ t "common.actions" }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Upgrade request</td>
+                    <td>{{ t "client.tickets.status.open" }}</td>
+                    <td><a class="button button-ghost" href="#">{{ t "client.tickets.actions.reply" }}</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ end }}

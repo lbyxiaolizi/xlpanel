@@ -1,0 +1,37 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "client.profile.title" }}</h1>
+    <p>{{ t "client.profile.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card">
+            <h3>{{ t "client.profile.personal_info" }}</h3>
+            <form class="form">
+                <div class="field">
+                    <label>{{ t "client.profile.fields.first_name" }}</label>
+                    <input class="input" type="text" placeholder="Alex" />
+                </div>
+                <div class="field">
+                    <label>{{ t "client.profile.fields.last_name" }}</label>
+                    <input class="input" type="text" placeholder="Chen" />
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <h3>{{ t "client.profile.contact_info" }}</h3>
+            <form class="form">
+                <div class="field">
+                    <label>{{ t "client.profile.fields.email" }}</label>
+                    <input class="input" type="email" placeholder="you@example.com" />
+                </div>
+                <div class="field">
+                    <label>{{ t "client.profile.fields.phone" }}</label>
+                    <input class="input" type="tel" placeholder="+1 (555) 010-0000" />
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{{ end }}

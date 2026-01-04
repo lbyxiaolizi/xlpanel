@@ -5,31 +5,35 @@ package web
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Response codes for standardized API responses
 const (
-	CodeSuccess       = 0
-	CodeBadRequest    = 400
-	CodeUnauthorized  = 401
-	CodeForbidden     = 403
-	CodeNotFound      = 404
-	CodeConflict      = 409
-	CodeValidation    = 422
-	CodeTooMany       = 429
-	CodeServerError   = 500
+	CodeSuccess            = 0
+	CodeBadRequest         = 400
+	CodeUnauthorized       = 401
+	CodeForbidden          = 403
+	CodeNotFound           = 404
+	CodeConflict           = 409
+	CodeValidation         = 422
+	CodeTooMany            = 429
+	CodeServerError        = 500
 	CodeServiceUnavailable = 503
 )
 
 // APIResponse represents a standard API response structure
 type APIResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-	Errors  interface{} `json:"errors,omitempty"`
-	Meta    *MetaData   `json:"meta,omitempty"`
+	Success   bool        `json:"success"`
+	Code      int         `json:"code"`
+	Message   string      `json:"message"`
+	Data      interface{} `json:"data,omitempty"`
+	Errors    interface{} `json:"errors,omitempty"`
+	Meta      *MetaData   `json:"meta,omitempty"`
+	Timestamp string      `json:"timestamp,omitempty"`
+	RequestID string      `json:"request_id,omitempty"`
 }
 
 // MetaData contains pagination and additional response metadata
@@ -61,27 +65,36 @@ var DefaultResponder = NewResponder()
 // Success sends a successful JSON response
 func (r *Responder) Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, APIResponse{
-		Code:    CodeSuccess,
-		Message: "success",
-		Data:    data,
+		Success:   true,
+		Code:      CodeSuccess,
+		Message:   "success",
+		Data:      data,
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
 // SuccessWithMessage sends a successful JSON response with custom message
 func (r *Responder) SuccessWithMessage(c *gin.Context, message string, data interface{}) {
 	c.JSON(http.StatusOK, APIResponse{
-		Code:    CodeSuccess,
-		Message: message,
-		Data:    data,
+		Success:   true,
+		Code:      CodeSuccess,
+		Message:   message,
+		Data:      data,
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
 // Created sends a 201 Created response
 func (r *Responder) Created(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusCreated, APIResponse{
-		Code:    CodeSuccess,
-		Message: "created",
-		Data:    data,
+		Success:   true,
+		Code:      CodeSuccess,
+		Message:   "created",
+		Data:      data,
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
@@ -98,6 +111,7 @@ func (r *Responder) Paginated(c *gin.Context, items interface{}, page, perPage i
 	}
 
 	c.JSON(http.StatusOK, APIResponse{
+		Success: true,
 		Code:    CodeSuccess,
 		Message: "success",
 		Data:    items,
@@ -108,23 +122,31 @@ func (r *Responder) Paginated(c *gin.Context, items interface{}, page, perPage i
 			TotalPages: totalPages,
 			HasMore:    page < totalPages,
 		},
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
 // Error sends an error response with the specified status code
 func (r *Responder) Error(c *gin.Context, statusCode int, code int, message string) {
 	c.JSON(statusCode, APIResponse{
-		Code:    code,
-		Message: message,
+		Success:   false,
+		Code:      code,
+		Message:   message,
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
 // ErrorWithDetails sends an error response with additional details
 func (r *Responder) ErrorWithDetails(c *gin.Context, statusCode int, code int, message string, errors interface{}) {
 	c.JSON(statusCode, APIResponse{
-		Code:    code,
-		Message: message,
-		Errors:  errors,
+		Success:   false,
+		Code:      code,
+		Message:   message,
+		Errors:    errors,
+		Timestamp: time.Now().Format(time.RFC3339),
+		RequestID: requestID(c),
 	})
 }
 
@@ -214,6 +236,19 @@ func (r *Responder) File(c *gin.Context, filepath string) {
 // FileAttachment sends a file as attachment (download)
 func (r *Responder) FileAttachment(c *gin.Context, filepath, filename string) {
 	c.FileAttachment(filepath, filename)
+}
+
+func requestID(c *gin.Context) string {
+	if c == nil {
+		return ""
+	}
+	if id := c.GetHeader("X-Request-ID"); id != "" {
+		return id
+	}
+	if id := c.Writer.Header().Get("X-Request-ID"); id != "" {
+		return id
+	}
+	return ""
 }
 
 // Global convenience functions

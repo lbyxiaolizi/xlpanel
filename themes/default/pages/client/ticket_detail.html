@@ -1,0 +1,16 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "client.tickets.title" }} #{{ .TicketID }}</h1>
+    <p>{{ t "client.tickets.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="card">
+        <h3>{{ t "client.tickets.subject" }}</h3>
+        <p>Invoice question</p>
+        <h3>{{ t "client.tickets.status.open" }}</h3>
+        <p>We're reviewing your request. Our team will respond shortly.</p>
+        <a class="button button-primary" href="/client/tickets">{{ t "client.tickets.actions.reply" }}</a>
+    </div>
+</section>
+{{ end }}

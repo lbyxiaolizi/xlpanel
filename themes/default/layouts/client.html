@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ .Description }}">
+    <title>{{ if .Title }}{{ .Title }} - {{ end }}{{ t "common.app_name" }}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/{{ .Theme }}/assets/images/favicon.svg">
+    <link rel="stylesheet" href="/static/{{ .Theme }}/assets/css/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="/client">
+                <span class="brand-mark">OH</span>
+                <span>{{ t "nav.client_area" }}</span>
+            </a>
+            <nav class="sidebar-nav">
+                <a class="sidebar-link {{ if eq .Section "dashboard" }}is-active{{ end }}" href="/client">{{ t "client.dashboard.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "services" }}is-active{{ end }}" href="/client/services">{{ t "client.services.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "invoices" }}is-active{{ end }}" href="/client/invoices">{{ t "client.invoices.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "tickets" }}is-active{{ end }}" href="/client/tickets">{{ t "client.tickets.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "profile" }}is-active{{ end }}" href="/client/profile">{{ t "client.profile.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "affiliates" }}is-active{{ end }}" href="/client/affiliates">{{ t "client.affiliates.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "domains" }}is-active{{ end }}" href="/client/domains">{{ t "client.domains.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "subusers" }}is-active{{ end }}" href="/client/subusers">{{ t "client.subusers.title" }}</a>
+                <a class="sidebar-link {{ if eq .Section "security" }}is-active{{ end }}" href="/client/security">{{ t "client.security.title" }}</a>
+            </nav>
+            <div class="card card-muted">
+                <div class="badge">{{ t "nav.support" }}</div>
+                <p>{{ t "home.cta.subtitle" }}</p>
+                <a class="button button-primary" href="/support">{{ t "nav.support" }}</a>
+            </div>
+        </aside>
+        <div class="app-main">
+            <div class="app-topbar">
+                <button class="icon-button mobile-only" data-sidebar-toggle aria-label="Toggle sidebar">☰</button>
+                <div>
+                    <strong>{{ t "common.app_name" }}</strong>
+                </div>
+                <div class="nav-actions">
+                    <button class="icon-button" data-theme-toggle aria-label="Toggle theme">◐</button>
+                    <a class="button button-outline" href="/">{{ t "nav.home" }}</a>
+                </div>
+            </div>
+            <main class="app-content">
+                {{ if .Flash }}
+                <div class="alert alert-{{ .Flash.Type }}">{{ .Flash.Message }}</div>
+                {{ end }}
+                {{ template "content" . }}
+            </main>
+        </div>
+    </div>
+    <script src="/static/{{ .Theme }}/assets/js/main.js"></script>
+</body>
+</html>

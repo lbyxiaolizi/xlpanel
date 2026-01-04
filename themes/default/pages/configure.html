@@ -1,0 +1,42 @@
+{{ define "content" }}
+<section class="page-header">
+    <span class="badge">{{ t "products.configure" }}</span>
+    <h1>{{ t "products.configure" }}</h1>
+    <p>{{ t "products.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card">
+            <h3>Configuration</h3>
+            <div class="form">
+                <div class="field">
+                    <label>Region</label>
+                    <select class="select">
+                        <option>US-East</option>
+                        <option>Europe</option>
+                        <option>Asia Pacific</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Plan</label>
+                    <select class="select">
+                        <option>Starter</option>
+                        <option>Growth</option>
+                        <option>Scale</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card card-muted">
+            <h3>{{ t "cart.summary" }}</h3>
+            <div class="list">
+                <span>{{ t "common.subtotal" }}: $29.00</span>
+                <span>{{ t "common.tax" }}: $0.00</span>
+                <strong>{{ t "common.total" }}: $29.00</strong>
+            </div>
+            <a class="button button-primary" href="/cart">{{ t "products.order_now" }}</a>
+        </div>
+    </div>
+</section>
+{{ end }}

@@ -1,28 +1,24 @@
 {{ define "content" }}
 <section class="page-header">
-    <h1>{{ t "client.subusers.title" }}</h1>
-    <p>{{ t "client.subusers.subtitle" }}</p>
+    <h1>{{ t "admin.servers.title" }}</h1>
+    <p>{{ t "home.features.subtitle" }}</p>
 </section>
 
 <section class="section">
     <div class="card">
-        <div class="section-header">
-            <h2 class="section-title">{{ t "client.subusers.permissions" }}</h2>
-            <a class="button button-primary" href="#">{{ t "client.subusers.invite" }}</a>
-        </div>
         <table class="table">
             <thead>
                 <tr>
                     <th>{{ t "common.name" }}</th>
-                    <th>{{ t "client.subusers.role" }}</th>
                     <th>{{ t "common.status" }}</th>
+                    <th>{{ t "common.actions" }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Finance Team</td>
-                    <td>Billing</td>
+                    <td>cluster-east-1</td>
                     <td>{{ t "common.active" }}</td>
+                    <td><a class="button button-ghost" href="#">{{ t "common.view" }}</a></td>
                 </tr>
             </tbody>
         </table>

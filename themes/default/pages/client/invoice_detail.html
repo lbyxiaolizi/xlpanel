@@ -1,0 +1,22 @@
+{{ define "content" }}
+<section class="page-header">
+    <h1>{{ t "client.invoices.invoice_number" }} {{ .InvoiceID }}</h1>
+    <p>{{ t "client.invoices.subtitle" }}</p>
+</section>
+
+<section class="section">
+    <div class="grid grid-2">
+        <div class="card">
+            <h3>{{ t "common.status" }}</h3>
+            <p>{{ t "client.invoices.status.unpaid" }}</p>
+            <h3>{{ t "client.invoices.due_date" }}</h3>
+            <p>2024-06-30</p>
+        </div>
+        <div class="card card-muted">
+            <h3>{{ t "common.total" }}</h3>
+            <p>$29.00</p>
+            <a class="button button-primary" href="/checkout">{{ t "client.invoices.actions.pay" }}</a>
+        </div>
+    </div>
+</section>
+{{ end }}
